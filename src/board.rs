@@ -31,6 +31,13 @@ impl BitBoard {
         bits = bits >> offset;
         bits
     }
+    pub fn get_space_array(&self) -> [u64; 7] {
+        let mut arr: [u64; 7] = [0; 7];
+        for i in 0..7 {
+            arr[i] = self.get_space(i as u64);
+        }
+        arr
+    }
     fn inc_space(&mut self, col: u64) {
         let offset = COL*ROW + SIZE_SPACE*col;
         let inc: u64 = 0b1 << offset;
@@ -58,6 +65,29 @@ impl BitBoard {
         self.set_stone(col, ROW - self.get_space(col), player);
     }
 
+    pub fn print(&self) {
+        let spacearr = self.get_space_array();
+
+        println!("board {:#b}", self.board);
+        for row in (0..6).rev() {
+            for col in 0..7 {
+                
+                if ROW - spacearr[col] <= row {
+                    print!(". ");
+                } else {
+                    let offset: u64 = row*COL + (col as u64);
+                    let bit = (self.board & (0b1 << offset)) >> (offset);
+                    if bit == 0 {
+                        print!("O ");
+                    } else {
+                        print!("X ");
+                    }
+                }
+            }
+            println!(" ");
+        }
+    }
+
     pub fn init()  -> BitBoard {
         BitBoard { board: INIT_BITBOARD }
     }
@@ -80,10 +110,13 @@ mod tests {
         b.unmake_move(3, crate::board::Player::P1);
         assert_eq!(b.get_space(3), 6);
 
+        b.print();
         b.make_move(0, crate::board::Player::P1);
         assert_eq!(b.board, 0b0_110_110_110_110_110_110_101_000000000000000000000000000000000000000000);
+        b.print();
         b.make_move(0, crate::board::Player::P2);
         assert_eq!(b.board, 0b0_110_110_110_110_110_110_100_000000000000000000000000000000000010000000);
+        b.print();
         b.unmake_move(0, crate::board::Player::P2);
         assert_eq!(b.board, 0b0_110_110_110_110_110_110_101_000000000000000000000000000000000000000000);
         b.unmake_move(0, crate::board::Player::P1);
