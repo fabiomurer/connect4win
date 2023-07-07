@@ -1,4 +1,4 @@
-use std::fmt;
+use std::collections::{linked_list, LinkedList};
 
 const COL:u64 = 7;
 const ROW:u64 = 6;
@@ -15,6 +15,22 @@ pub enum GameState {
 pub enum Player {
     P1,
     P2,
+}
+
+struct MoveStack {
+    moves: LinkedList<u8>,
+}
+
+impl MoveStack {
+    pub fn push_move(&mut self, col: u8) {
+        self.moves.push_front(col);
+    }
+    pub fn pop_move(&mut self, col: u8) -> u8 {
+        self.moves.pop_front().unwrap()
+    }
+    pub fn init()  -> MoveStack {
+        MoveStack { moves: LinkedList::new() }
+    }
 }
 
 #[derive(Default)]
@@ -91,6 +107,13 @@ impl BitBoard {
     pub fn init()  -> BitBoard {
         BitBoard { board: INIT_BITBOARD }
     }
+}
+
+struct Board {
+    movestack: MoveStack,
+    bitboard: BitBoard,
+    gamestate: GameState,
+    player: Player
 }
 
 #[cfg(test)]
