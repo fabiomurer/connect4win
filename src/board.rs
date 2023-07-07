@@ -33,6 +33,103 @@ impl MoveStack {
     }
 }
 
+#[derive (Clone, Copy)]
+struct ScoreSet {
+    score: i32,
+    p1: i32,
+    p2: i32
+}
+
+impl ScoreSet {
+    fn fix_score(&mut self) {
+        if self.p1 == 0 || self.p2 == 0 {
+            if self.p1 > self.p2 {
+                self.score = self.p1;
+            } else {
+                self.score = -self.p2
+            }
+        } else {
+            self.score = 0;
+        }
+    }
+    fn add(&mut self, player: Player) {
+        match player {
+            Player::P1 => self.p1 += 1,
+            Player::P2 => self.p2 += 1
+        }
+        self.fix_score();
+    }
+    fn sub(&mut self, player: Player) {
+        match player {
+            Player::P1 => self.p1 -= 1,
+            Player::P2 => self.p2 -= 1
+        }
+        self.fix_score();
+    }
+    
+    pub fn init() -> ScoreSet {
+        ScoreSet { score: 0, p1: 0, p2: 0 }
+    }
+}
+
+#[derive (Clone)]
+struct ScoreBoard {
+    scoreboard: [[LinkedList<ScoreSet>; ROW as usize]; COL as usize]
+}
+
+impl ScoreBoard {
+    
+    pub fn init() -> ScoreBoard {
+        let mut sb: [[LinkedList<ScoreSet>; ROW as usize]; COL as usize] = 
+        [
+            [LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new()],
+            [LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new()],
+            [LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new()],
+            [LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new()],
+            [LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new()],
+            [LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new()],
+            [LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new(), LinkedList::new()]
+        ];
+        for i in 0..ROW {
+            for j in 0..COL {
+                if ROW - i >= CONNECT {
+                    let sc: ScoreSet = ScoreSet::init();
+                    for k in i..CONNECT {
+                        sb[k as usize][j as usize].push_back(sc);
+                    }
+                }
+                if COL - j >= CONNECT {
+                    let sc: ScoreSet = ScoreSet::init();
+                    for k in j..CONNECT {
+                        sb[i as usize][k as usize].push_back(sc);
+                    }
+                }
+                if (ROW - i >= CONNECT) && (COL - j >= CONNECT) {
+                    let sc: ScoreSet = ScoreSet::init();
+                    let mut kk = j;
+                    for k in i..CONNECT {
+                        sb[k as usize][kk as usize].push_back(sc);
+                        kk += 1;
+                    }
+                }
+                if (i + 1 >= CONNECT) && (COL - j >= CONNECT) {
+                    let sc: ScoreSet = ScoreSet::init();
+                    let mut kk = j;
+                    
+                    let mut k = i;
+                    while i - k < CONNECT {
+                        sb[k as usize][kk as usize].push_back(sc);
+                        k -= 1;
+                        kk += 1;
+                    }
+                }
+            }
+        }
+
+        ScoreBoard { scoreboard: sb }
+    }
+}
+
 #[derive(Default)]
 struct BitBoard {
     board: u64,
