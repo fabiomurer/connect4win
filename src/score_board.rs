@@ -49,7 +49,7 @@ const NSC: usize = 207; // chissà se è giosto
 #[derive(Clone)]
 pub struct ScoreBoard {
     total_score: i32,
-    scoreboard: [[LinkedList<u32>; ROW as usize]; COL as usize],
+    scoreboard: [[LinkedList<u32>; COL as usize]; ROW as usize],
     scoresets: [ScoreSet; NSC],
 }
 
@@ -69,6 +69,7 @@ impl ScoreBoard {
 
             delta_score  += sc.score - ps;
         }
+        self.total_score += delta_score;
         win
     }
 
@@ -87,13 +88,15 @@ impl ScoreBoard {
 
             delta_score  += sc.score - ps;
         }
+        self.total_score += delta_score;
     }
 
     pub fn init() -> ScoreBoard {
         let mut sca: [ScoreSet; NSC] = [ScoreSet::init(); NSC];
 
-        let mut sbt: [[LinkedList<u32>; ROW as usize]; COL as usize] = [
+        let mut sbt: [[LinkedList<u32>; COL as usize]; ROW as usize] = [
             [
+                LinkedList::new(),
                 LinkedList::new(),
                 LinkedList::new(),
                 LinkedList::new(),
@@ -108,24 +111,10 @@ impl ScoreBoard {
                 LinkedList::new(),
                 LinkedList::new(),
                 LinkedList::new(),
-            ],
-            [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
                 LinkedList::new(),
             ],
             [
                 LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-            ],
-            [
                 LinkedList::new(),
                 LinkedList::new(),
                 LinkedList::new(),
@@ -140,8 +129,19 @@ impl ScoreBoard {
                 LinkedList::new(),
                 LinkedList::new(),
                 LinkedList::new(),
+                LinkedList::new(),
             ],
             [
+                LinkedList::new(),
+                LinkedList::new(),
+                LinkedList::new(),
+                LinkedList::new(),
+                LinkedList::new(),
+                LinkedList::new(),
+                LinkedList::new(),
+            ],
+            [
+                LinkedList::new(),
                 LinkedList::new(),
                 LinkedList::new(),
                 LinkedList::new(),
@@ -174,21 +174,18 @@ impl ScoreBoard {
                     n += 1;
                 }
                 if (i + 1 >= CONNECT) && (COL - j >= CONNECT) {
-                    let mut kk = j;
                     let mut k = i;
-                    loop {
+                    let mut kk = i;
+                    while i-k >= CONNECT {
                         sbt[k as usize][kk as usize].push_back(n);
-                        n += 1;
-                        kk += 1;
-                        if i - k >= CONNECT - 1 {
-                            break;
-                        }
-                        k -= 1;
+                        kk+=1; 
+                        k-=1;
                     }
                     n +=1;
                 }
             }
         }
+        println!("n {}", n);
 
         let sb = sbt;
         ScoreBoard {
@@ -196,5 +193,19 @@ impl ScoreBoard {
             scoreboard: sb,
             scoresets: sca,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ScoreBoard;
+
+
+    #[test]
+    fn lel () {
+        let mut ss: ScoreBoard = ScoreBoard::init();
+        ss.make_move(0, 6, &crate::board::Player::P1);
+        println!("total score {}", ss.total_score);
+        
     }
 }
