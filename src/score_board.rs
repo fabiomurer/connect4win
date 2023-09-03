@@ -189,7 +189,6 @@ impl ScoreBoard {
                 }
             }
         }
-        println!("n {}", n);
 
         let sb = sbt;
         ScoreBoard {

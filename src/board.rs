@@ -1,6 +1,7 @@
 use crate::bit_board;
 use crate::score_board;
 use std::collections::LinkedList;
+use std::cmp::Ordering;
 
 pub const COL: u64 = 7;
 pub const ROW: u64 = 6;
@@ -12,6 +13,50 @@ pub enum GameState {
     DRAW,
     WINP1,
     WINP2,
+}
+
+impl PartialOrd for GameState {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        return Some(self.cmp(other));
+    }
+}
+impl Ord for GameState {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match self {
+            GameState::OPEN => {
+                match other {
+                    GameState::OPEN  => Ordering::Equal,
+                    GameState::DRAW  => Ordering::Greater,
+                    GameState::WINP1 => Ordering::Less,
+                    GameState::WINP2 => Ordering::Greater,
+                }
+            }
+            GameState::DRAW => {
+                match other {
+                    GameState::OPEN  => Ordering::Less,
+                    GameState::DRAW  => Ordering::Equal,
+                    GameState::WINP1 => Ordering::Less,
+                    GameState::WINP2 => Ordering::Greater,
+                }
+            }
+            GameState::WINP1 => {
+                match other {
+                    GameState::OPEN  => Ordering::Greater,
+                    GameState::DRAW  => Ordering::Greater,
+                    GameState::WINP1 => Ordering::Equal,
+                    GameState::WINP2 => Ordering::Greater,
+                }
+            }
+            GameState::WINP2 => {
+                match other {
+                    GameState::OPEN  => Ordering::Less,
+                    GameState::DRAW  => Ordering::Less,
+                    GameState::WINP1 => Ordering::Less,
+                    GameState::WINP2 => Ordering::Equal,
+                }
+            }
+        }
+    }
 }
 
 pub enum Player {
