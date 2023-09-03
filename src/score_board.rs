@@ -153,35 +153,39 @@ impl ScoreBoard {
         let mut n: u32 = 0;
         for i in 0..ROW {
             for j in 0..COL {
-                if ROW - i >= CONNECT {
-                    for k in i..CONNECT {
+                
+                if ROW - i >= CONNECT { // orizontal --
+                    for k in i..(i+CONNECT) {
                         sbt[k as usize][j as usize].push_back(n);
                     }
                     n += 1;
                 }
-                if COL - j >= CONNECT {
-                    for k in j..CONNECT {
+                
+                if COL - j >= CONNECT { // vertical |
+                    for k in j..(j+CONNECT) {
                         sbt[i as usize][k as usize].push_back(n);
                     }
                     n += 1;
                 }
-                if (ROW - i >= CONNECT) && (COL - j >= CONNECT) {
+                
+                if (ROW - i >= CONNECT) && (COL - j >= CONNECT) { // diagonal \
                     let mut kk = j;
-                    for k in i..CONNECT {
+                    for k in i..(i+CONNECT) {
                         sbt[k as usize][kk as usize].push_back(n);
                         kk += 1;
                     }
                     n += 1;
                 }
-                if (i + 1 >= CONNECT) && (COL - j >= CONNECT) {
-                    let mut k = i;
-                    let mut kk = i;
-                    while i-k >= CONNECT {
+                
+                if (ROW - i >= CONNECT) && (j + 1 >= CONNECT) { // diagonal /
+                    let mut kk = j;
+                    for k in i..(i+CONNECT) {
                         sbt[k as usize][kk as usize].push_back(n);
-                        kk+=1; 
-                        k-=1;
+                        if kk > 0{
+                            kk -= 1;
+                        }
                     }
-                    n +=1;
+                    n += 1;
                 }
             }
         }
@@ -204,8 +208,9 @@ mod tests {
     #[test]
     fn lel () {
         let mut ss: ScoreBoard = ScoreBoard::init();
-        ss.make_move(6, 0, &crate::board::Player::P1);
-        println!("total score {}", ss.total_score);
+        ss.make_move(0, 0, &crate::board::Player::P1);
+        ss.make_move(0, 6, &crate::board::Player::P2);
+        assert_eq!(ss.total_score, 0)
         
     }
 }
