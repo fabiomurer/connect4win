@@ -204,7 +204,7 @@ mod tests {
     #[test]
     fn lel () {
         let mut ss: ScoreBoard = ScoreBoard::init();
-        ss.make_move(0, 6, &crate::board::Player::P1);
+        ss.make_move(6, 0, &crate::board::Player::P1);
         println!("total score {}", ss.total_score);
         
     }
