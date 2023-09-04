@@ -1,7 +1,9 @@
 use crate::bit_board;
+use crate::bit_board::BitBoard;
 use crate::score_board;
 use std::collections::LinkedList;
 use std::cmp::Ordering;
+use crate::score::*;
 
 pub const COL: u64 = 7;
 pub const ROW: u64 = 6;
@@ -75,14 +77,14 @@ impl MoveStack {
     pub fn pop_move(&mut self) -> u8 {
         self.moves.pop_front().unwrap()
     }
-    pub fn init() -> MoveStack {
+    pub fn new() -> MoveStack {
         MoveStack {
             moves: LinkedList::new(),
         }
     }
 }
 
-struct Board {
+pub struct Board {
     movestack: MoveStack,
     bitboard: bit_board::BitBoard,
     scoreboard: score_board::ScoreBoard,
@@ -133,14 +135,30 @@ impl Board {
             Player::P1 => self.player = Player::P2,
             Player::P2 => self.player = Player::P1,
         }
-    }    
-    pub fn init() -> Board {
+    }
+
+    pub fn evaluate(&self) -> Score {
+        Score { 
+            score: self.scoreboard.total_score(), 
+            state: self.gamestate.clone(),
+        }
+    }
+
+    pub fn new() -> Board {
         Board { 
-            movestack: MoveStack::init(), 
-            bitboard: bit_board::BitBoard::init(),
-            scoreboard: score_board::ScoreBoard::init(), 
+            movestack: MoveStack::new(), 
+            bitboard: bit_board::BitBoard::new(),
+            scoreboard: score_board::ScoreBoard::new(), 
             gamestate: GameState::OPEN, 
             player: Player::P1 
         }
+    }
+
+    pub fn player(&self) -> Player {
+        self.player
+    }
+
+    pub fn bitboard(&self) -> BitBoard {
+        self.bitboard
     }
 }

@@ -54,6 +54,10 @@ pub struct ScoreBoard {
 }
 
 impl ScoreBoard {
+    pub fn total_score(&self) -> i32 {
+        self.total_score
+    }
+    
     pub fn make_move(&mut self, row: usize, col: usize, player: &Player) -> bool {
         let mut delta_score: i32 = 0;
         let mut win: bool = false;
@@ -91,7 +95,7 @@ impl ScoreBoard {
         self.total_score += delta_score;
     }
 
-    pub fn init() -> ScoreBoard {
+    pub fn new() -> ScoreBoard {
         let mut sca: [ScoreSet; NSC] = [ScoreSet::init(); NSC];
 
         let mut sbt: [[LinkedList<u32>; COL as usize]; ROW as usize] = [
@@ -206,7 +210,7 @@ mod tests {
 
     #[test]
     fn lel () {
-        let mut ss: ScoreBoard = ScoreBoard::init();
+        let mut ss: ScoreBoard = ScoreBoard::new();
         ss.make_move(0, 0, &crate::board::Player::P1);
         ss.make_move(0, 6, &crate::board::Player::P2);
         assert_eq!(ss.total_score, 0)

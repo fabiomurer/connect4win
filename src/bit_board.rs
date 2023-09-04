@@ -19,7 +19,7 @@ impl Default for BitBoard {
 const SIZE_SPACE: u64 = 3;
 impl BitBoard {
     pub fn is_full(&self) -> bool {
-        if (self.board & (0b1_111_111_111_111_111_111_111_000000000000000000000000000000000000000000) == 0) {
+        if self.board & (0b1_111_111_111_111_111_111_111_000000000000000000000000000000000000000000) == 0 {
             true
         } else {
             false
@@ -88,7 +88,7 @@ impl BitBoard {
         }
     }
 
-    pub fn init() -> BitBoard {
+    pub fn new() -> BitBoard {
         BitBoard {
             board: INIT_BITBOARD,
         }
@@ -101,7 +101,7 @@ mod tests {
 
     #[test]
     fn init() {
-        let mut b: BitBoard = BitBoard::init();
+        let mut b: BitBoard = BitBoard::new();
         assert_eq!(b.get_space(6), 6);
         assert_eq!(b.get_space(0), 6);
 

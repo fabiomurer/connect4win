@@ -39,4 +39,24 @@ impl Ord for Score {
             return self.score.cmp(&other.score);
         }
     }
+
+    fn max(self, other: Self) -> Self
+        where
+            Self: Sized, {
+        if self > other {
+            self
+        } else {
+            other
+        }
+    }
+    
+    fn min(self, other: Self) -> Self
+        where
+            Self: Sized, {
+        if self < other {
+            self
+        } else {
+            other
+        }
+    }
 }
