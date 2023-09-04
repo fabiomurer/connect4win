@@ -7,7 +7,7 @@ pub const COL: u64 = 7;
 pub const ROW: u64 = 6;
 pub const CONNECT: u64 = 4;
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone)]
 pub enum GameState {
     OPEN,
     DRAW,

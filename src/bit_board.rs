@@ -1,11 +1,19 @@
+use std::hash::Hash;
+
 use crate::board::*;
 
 const INIT_BITBOARD: u64 =
     0b0_110_110_110_110_110_110_110_000000000000000000000000000000000000000000;
 
-#[derive(Default)]
+#[derive(Clone, Hash, PartialEq, Eq)]
 pub struct BitBoard {
     board: u64,
+}
+
+impl Default for BitBoard {
+    fn default() -> Self {
+        BitBoard { board: INIT_BITBOARD }
+    }
 }
 
 const SIZE_SPACE: u64 = 3;

@@ -1,9 +1,16 @@
 use crate::board::*;
 use std::cmp::Ordering;
 
+#[derive(Clone)]
 pub struct Score {
     pub score: i32,
     pub state: GameState,
+}
+
+impl Default for Score {
+    fn default() -> Self {
+        Score { score: 0, state: GameState::OPEN }
+    }
 }
 
 impl Eq for Score {}
