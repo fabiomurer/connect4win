@@ -10,6 +10,14 @@ pub struct Move {
     depth: u8,
 }
 
+impl Move {
+    pub fn new(col: u8, player: Player, score: Score, depth: u8) -> Self { Self { col, player, score, depth } }
+
+    pub fn col(&self) -> u8 {
+        self.col
+    }
+}
+
 impl Eq for Move {}
 
 impl PartialEq for Move {

@@ -52,9 +52,9 @@ impl Table {
         }
     }
 
-    pub fn set(&mut self, key: &BitBoard, score: &Score) {
-        let index = self.get_index(key);
-        let entry: Entry = Entry { score: score.clone(), key: key.clone() };
+    pub fn set(&mut self, key: BitBoard, score: Score) {
+        let index = self.get_index(&key);
+        let entry: Entry = Entry { score: score, key: key };
         self.table[index] = entry;
     }
 }

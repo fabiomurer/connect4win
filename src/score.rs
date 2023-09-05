@@ -1,11 +1,14 @@
 use crate::board::*;
 use std::cmp::Ordering;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Score {
     pub score: i32,
     pub state: GameState,
 }
+
+pub const MAX: Score = Score { score: 0, state: GameState::WINP1 };
+pub const MIN: Score = Score { score: 0, state: GameState::WINP2 };
 
 impl Default for Score {
     fn default() -> Self {

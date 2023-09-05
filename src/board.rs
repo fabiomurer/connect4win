@@ -9,7 +9,7 @@ pub const COL: u64 = 7;
 pub const ROW: u64 = 6;
 pub const CONNECT: u64 = 4;
 
-#[derive(PartialEq, Eq, Clone)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum GameState {
     OPEN,
     DRAW,
@@ -61,6 +61,7 @@ impl Ord for GameState {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Copy)]
 pub enum Player {
     P1,
     P2,
@@ -137,6 +138,17 @@ impl Board {
         }
     }
 
+    pub fn legal_moves(&self) -> Vec<u8> {
+        let mut v: Vec<u8> = Vec::new();
+        let spaces = self.bitboard.get_space_array();
+        for i in spaces {
+            if i > 0 {
+                v.push(u8::try_from(i).unwrap());
+            }
+        }
+        v
+    }
+
     pub fn evaluate(&self) -> Score {
         Score { 
             score: self.scoreboard.total_score(), 
@@ -160,5 +172,9 @@ impl Board {
 
     pub fn bitboard(&self) -> BitBoard {
         self.bitboard
+    }
+
+    pub fn gamestate(&self) -> GameState {
+        self.gamestate
     }
 }
