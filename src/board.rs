@@ -9,7 +9,7 @@ pub const COL: u64 = 7;
 pub const ROW: u64 = 6;
 pub const CONNECT: u64 = 4;
 
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GameState {
     OPEN,
     DRAW,
@@ -67,6 +67,7 @@ pub enum Player {
     P2,
 }
 
+#[derive(Clone)]
 struct MoveStack {
     moves: LinkedList<u8>,
 }
@@ -85,6 +86,7 @@ impl MoveStack {
     }
 }
 
+#[derive(Clone)]
 pub struct Board {
     movestack: MoveStack,
     bitboard: bit_board::BitBoard,

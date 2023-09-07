@@ -1,38 +1,36 @@
 use crate::board::*;
 use crate::score::*;
 use crate::transposition_table::*;
-use crate::Move::*;
+use crate::r#move::*;
 use crate::timer::*;
 
 
 pub struct Engine {
-    board: Board,
     timer: Timer,
     table: Table,
 } 
 
 impl Engine {
     pub fn new(seconds: u64, table_size: usize) -> Engine {
-        Engine { 
-            board: Board::new(), 
+        Engine {
             timer: Timer::new(seconds), 
             table: Table::new(table_size),
         }
     }
 
-    fn move_sort(&mut self) -> Vec<u8> {
-        let v = self.board.legal_moves();
+    fn move_sort(board: &mut Board) -> Vec<u8> {
+        let v = board.legal_moves();
         let mut mv: Vec<Move> = Vec::new();
         let mut out: Vec<u8> = Vec::new();
 
         for m in v {
-            self.board.make_move(m);
-            mv.push(Move::new(m, self.board.player(), self.board.evaluate(), 1));
+            board.make_move(m);
+            mv.push(Move::new(m, board.player(), board.evaluate(), 1));
 
-            self.board.unmake_move();
+            board.unmake_move();
         }
         mv.sort();
-        if self.board.player() == Player::P1 {
+        if board.player() == Player::P1 {
             mv.reverse();
         }
 
@@ -42,10 +40,10 @@ impl Engine {
         out
     }
 
-    pub fn alpha_beta(&mut self, mut alpha: Score, mut beta: Score, depth: u8) -> Result<Score, TimeoutError> {
+    pub fn alpha_beta(&mut self, board: &mut Board, mut alpha: Score, mut beta: Score, depth: u8) -> Result<Score, TimeoutError> {
         let saved_score: Option<Score>;
         if depth >= 2 {
-            saved_score = self.table.get(&self.board.bitboard());
+            saved_score = self.table.get(&board.bitboard());
         } else {
             saved_score = None;
         }
@@ -57,27 +55,34 @@ impl Engine {
                 let mut eval: Score;
 
                 if depth >= 1 {
-                    moves = self.move_sort();
+                    moves = Self::move_sort(board);
                 } else {
-                    moves = self.board.legal_moves();
+                    moves = board.legal_moves();
                 }
 
-                if depth <= 0 || self.board.gamestate() != GameState::OPEN {
-                    return Ok(self.board.evaluate());
+                if depth <= 0 || board.gamestate() != GameState::OPEN {
+                    return Ok(board.evaluate());
                 } else {
-                    match self.board.player() {
+                    match board.player() {
                         Player::P1 => {
                             eval = MIN;
                             for m in moves {
                                 match self.timer.check() {
                                     Ok(_) => {
-                                        self.board.make_move(m);
-                                        eval = eval.max(self.board.evaluate());
-                                        alpha = alpha.max(eval);
-                                        self.board.unmake_move();
-
-                                        if alpha > beta {
-                                            break;
+                                        board.make_move(m);
+                                        match self.alpha_beta(board, alpha, beta, depth - 1) {
+                                            Ok(newscore) => {
+                                                eval = eval.max(newscore);
+                                                alpha = alpha.max(eval);
+                                                board.unmake_move();
+        
+                                                if alpha > beta {
+                                                    break;
+                                                }
+                                            },
+                                            Err(TimeoutError) => {
+                                                return Err(TimeoutError);
+                                            }
                                         }
                                     },
                                     Err(TimeoutError) => {
@@ -91,13 +96,19 @@ impl Engine {
                             for m in moves {
                                 match self.timer.check() {
                                     Ok(_) => {
-                                        self.board.make_move(m);
-                                        eval = eval.min(self.board.evaluate());
-                                        beta = beta.min(eval);
-                                        self.board.unmake_move();
+                                        board.make_move(m);
+                                        match self.alpha_beta(board, alpha, beta, depth - 1) {
+                                            Ok(newscore) => {
+                                                beta = beta.min(newscore);
+                                                board.unmake_move();
 
-                                        if alpha > beta {
-                                            break;
+                                                if alpha > beta {
+                                                    break;
+                                                }
+                                            },
+                                            Err(TimeoutError) => {
+                                                return Err(TimeoutError);
+                                            }
                                         }
                                     },
                                     Err(TimeoutError) => {
@@ -109,10 +120,113 @@ impl Engine {
                     }
                 }
                 if depth >= 2 {
-                    self.table.set(self.board.bitboard(), eval);
+                    self.table.set(board.bitboard(), eval);
                 }
                 return Ok(eval);
             }
         }
+    }
+
+    fn move_list(&mut self, board: &mut Board, prev_ml: &Vec<Move>, depth: u8) -> Result<Vec<Move>, TimeoutError> {
+        let mut alpha = MIN;
+        let mut beta = MAX;
+        let mut out: Vec<Move> = Vec::new();
+
+        match board.player() {
+            Player::P1 => {
+                for m in prev_ml {
+                    match self.timer.check() {
+                        Ok(_) => {
+                            match m.score().state {
+                                GameState::OPEN => {
+                                    board.make_move(m.col());
+                                    match self.alpha_beta(board, alpha, beta, depth - 1) {
+                                        Ok(newscore) => {
+                                            out.push(Move::new(m.col(), m.player(), newscore, depth));
+                                            alpha = alpha.max(newscore);
+                                            board.unmake_move();
+                                        },
+                                        Err(TimeoutError) => {
+                                            return Err(TimeoutError);
+                                        }
+                                    }
+                                },
+                                _ => {
+                                    out.push(m.clone());
+                                }
+                            }
+                            return Ok(out);
+                        },
+                        Err(TimeoutError) => {
+                            return Err(TimeoutError);
+                        }
+                    }
+                }
+            },
+            Player::P2 => {
+                for m in prev_ml {
+                    match self.timer.check() {
+                        Ok(_) => {
+                            match m.score().state {
+                                GameState::OPEN => {
+                                    board.make_move(m.col());
+                                    match self.alpha_beta(board, alpha, beta, depth - 1) {
+                                        Ok(newscore) => {
+                                            out.push(Move::new(m.col(), m.player(), newscore, depth));
+                                            beta = beta.min(newscore);
+                                            board.unmake_move();
+                                        },
+                                        Err(TimeoutError) => {
+                                            return Err(TimeoutError);
+                                        }
+                                    }
+                                },
+                                _ => {
+                                    out.push(m.clone());
+                                }
+                            }
+                            return Ok(out);
+                        },
+                        Err(TimeoutError) => {
+                            return Err(TimeoutError);
+                        }
+                    }
+                }
+            }
+        }
+        return Err(TimeoutError)
+    }
+
+    fn init_move_array(board: &Board) -> Vec<Move> {
+        let mut out: Vec<Move> = Vec::new();
+        let cols = board.legal_moves();
+        for c in cols {
+            out.push(Move::new(c, board.player(), EQUAL , 0));
+        }
+        out
+    }
+
+    pub fn iterative_depening(&mut self, board: &Board) -> Move {
+        let mut tb: Board = board.clone();
+        let mut movelist = Self::init_move_array(&tb);
+        let mut bestmove: Move = movelist[0];
+        let cells: u8 = 7*6;
+        for i in 1..cells {
+            self.table.clean();
+            match self.move_list(&mut tb, &movelist, i) {
+                Ok(mut ml) => {
+                    ml.sort();
+                    if board.player() == Player::P1 {
+                        ml.reverse();
+                        movelist = ml;
+                        bestmove = movelist[0];
+                    }
+                },
+                Err(TimeoutError) => {
+                    return bestmove;
+                }
+            }
+        }
+        return bestmove;
     }
 }

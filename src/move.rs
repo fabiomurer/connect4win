@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use crate::board::*;
 use crate::score::*;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Move {
     col: u8,
     player: Player,
@@ -15,6 +16,18 @@ impl Move {
 
     pub fn col(&self) -> u8 {
         self.col
+    }
+
+    pub fn score(&self) -> Score {
+        self.score
+    }
+
+    pub fn player(&self) -> Player {
+        self.player
+    }
+
+    pub fn depth(&self) -> u8 {
+        self.depth
     }
 }
 
