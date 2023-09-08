@@ -97,7 +97,7 @@ pub struct Board {
 
 impl Board {
     pub fn make_move(&mut self, col: u8) {
-        if col < 0 && col as u64 > COL {
+        if col as u64 > COL {
             panic!("this collumn does not exist")
         } else if self.bitboard.get_space(col as u64) < 1 {
             panic!("collumn full")

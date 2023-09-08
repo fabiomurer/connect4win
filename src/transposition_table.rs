@@ -58,3 +58,18 @@ impl Table {
         self.table[index] = entry;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn getset() {
+        let mut table = Table::new(100);
+        let mut bitboard = BitBoard::new();
+        bitboard.make_move(0, &crate::board::Player::P1);
+        table.set(bitboard, EQUAL);
+        let sc = table.get(&bitboard).unwrap();
+        assert_eq!(sc, EQUAL);
+    }
+}

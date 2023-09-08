@@ -79,16 +79,11 @@ impl ScoreBoard {
 
     pub fn unmake_move(&mut self, row: usize, col: usize, player: &Player) {
         let mut delta_score: i32 = 0;
-        let mut win: bool = false;
 
         for i in self.scoreboard[row][col].iter() {
             let mut sc = self.scoresets[*i as usize];
             let ps = sc.score;
             sc.sub(player);
-
-            if sc.score == CONNECT as i32{
-                win = true;
-            }
 
             delta_score  += sc.score - ps;
         }
@@ -96,7 +91,7 @@ impl ScoreBoard {
     }
 
     pub fn new() -> ScoreBoard {
-        let mut sca: [ScoreSet; NSC] = [ScoreSet::init(); NSC];
+        let sca: [ScoreSet; NSC] = [ScoreSet::init(); NSC];
 
         let mut sbt: [[LinkedList<u32>; COL as usize]; ROW as usize] = [
             [
