@@ -4,17 +4,17 @@ use std::collections::LinkedList;
 #[derive(Debug, Clone, Copy)]
 pub struct ScoreSet {
     score: i32,
-    p1: i32,
-    p2: i32,
+    p1: u32,
+    p2: u32,
 }
 
 impl ScoreSet {
     fn fix_score(&mut self) {
         if self.p1 == 0 || self.p2 == 0 {
             if self.p1 > self.p2 {
-                self.score = self.p1;
+                self.score = self.p1 as i32;
             } else {
-                self.score = -self.p2
+                self.score = -(self.p2 as i32);
             }
         } else {
             self.score = 0;
@@ -63,7 +63,7 @@ impl ScoreBoard {
         let mut win: bool = false;
 
         for i in self.scoreboard[row][col].iter() {
-            let mut sc = self.scoresets[*i as usize];
+            let sc = &mut self.scoresets[*i as usize];
             let ps = sc.score;
             sc.add(player);
 
@@ -81,7 +81,7 @@ impl ScoreBoard {
         let mut delta_score: i32 = 0;
 
         for i in self.scoreboard[row][col].iter() {
-            let mut sc = self.scoresets[*i as usize];
+            let sc = &mut self.scoresets[*i as usize];
             let ps = sc.score;
             sc.sub(player);
 
@@ -207,8 +207,16 @@ mod tests {
     fn lel () {
         let mut ss: ScoreBoard = ScoreBoard::new();
         ss.make_move(0, 0, &crate::board::Player::P1);
+        assert_eq!(ss.total_score, 3);
         ss.make_move(0, 6, &crate::board::Player::P2);
-        assert_eq!(ss.total_score, 0)
-        
+        assert_eq!(ss.total_score, 0)   
+    }
+
+    #[test]
+    fn tm () {
+        let mut ss: ScoreBoard = ScoreBoard::new();
+        ss.make_move(0, 0, &crate::board::Player::P1);
+        ss.unmake_move(0, 0, &crate::board::Player::P1);
+        assert_eq!(ss.total_score, 0)  
     }
 }

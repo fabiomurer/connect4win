@@ -127,17 +127,17 @@ impl Board {
 
     }
     pub fn unmake_move(&mut self) {
-        let col = self.movestack.pop_move();
-        let row = ROW - self.bitboard.get_space(col as u64);
-
-        self.bitboard.unmake_move(col as u64, &self.player);
-        self.scoreboard.unmake_move(row as usize, col as usize, &self.player);
-
         self.gamestate = GameState::OPEN;
         match self.player {
             Player::P1 => self.player = Player::P2,
             Player::P2 => self.player = Player::P1,
         }
+        
+        let col = self.movestack.pop_move();
+        let row = ROW - self.bitboard.get_space(col as u64);
+
+        self.bitboard.unmake_move(col as u64, &self.player);
+        self.scoreboard.unmake_move(row as usize, col as usize, &self.player);
     }
 
     pub fn legal_moves(&self) -> Vec<u8> {
