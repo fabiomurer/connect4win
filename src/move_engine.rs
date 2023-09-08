@@ -26,7 +26,6 @@ impl Engine {
         for m in v {
             board.make_move(m);
             mv.push(Move::new(m, board.player(), board.evaluate(), 1));
-
             board.unmake_move();
         }
         mv.sort();
@@ -207,6 +206,7 @@ impl Engine {
     }
 
     pub fn iterative_depening(&mut self, board: &Board) -> Move {
+        self.timer.start();
         let mut tb: Board = board.clone();
         let mut movelist = Self::init_move_array(&tb);
         let mut bestmove: Move = movelist[0];
@@ -228,5 +228,17 @@ impl Engine {
             }
         }
         return bestmove;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn ml() {
+        let mut b = Board::new();
+        let ml = Engine::move_sort(&mut b);
+        println!("{:?}", ml)
     }
 }

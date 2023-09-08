@@ -38,9 +38,9 @@ impl PartialOrd for Score {
 impl Ord for Score {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.state == other.state {
-            return self.state.cmp(&other.state);
-        } else {
             return self.score.cmp(&other.score);
+        } else {
+            return self.state.cmp(&other.state);
         }
     }
 
@@ -62,5 +62,25 @@ impl Ord for Score {
         } else {
             other
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cmpp() {
+        let s1 = MAX;
+        let s2 = EQUAL;
+        assert_eq!(MAX, s1.max(s2));
+
+        let s1 = Score { score: 12, state: GameState::OPEN };
+        let s2 = Score { score: 0, state: GameState::OPEN };
+        assert_eq!(s1, s2.max(s1));
+
+        let s1 = Score { score: 12, state: GameState::DRAW };
+        let s2 = Score { score: 0, state: GameState::OPEN };
+        assert_eq!(s2, s2.max(s1));
     }
 }

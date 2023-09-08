@@ -1,4 +1,4 @@
-use std::{time::{Duration, Instant}, sync::mpsc::RecvTimeoutError, fmt::write};
+use std::time::{Duration, Instant};
 use std::fmt;
 
 #[derive(Debug, Clone)]
@@ -32,6 +32,22 @@ impl Timer {
         } else {
             Ok(elapsed)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::{thread, time};
+
+    #[test]
+    #[should_panic]
+    fn elapsed() {
+        let mut t = Timer::new(1);
+        let second = time::Duration::from_secs(1);
+        t.start();
+        thread::sleep(second);
+        t.check().unwrap();
     }
 }
 

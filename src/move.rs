@@ -54,7 +54,7 @@ impl Ord for Move {
             let half_row = col / 2;
             let distance_a = ((self.col as i32) - half_row).abs();
             let distance_b = ((other.col as i32) - half_row).abs();
-            return distance_a.cmp(&distance_b);
+            return distance_b.cmp(&distance_a);
         } else {
             if compare_score != Ordering::Equal {
                 return compare_score;
@@ -70,4 +70,23 @@ impl Ord for Move {
         }
     }
 }
-        
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cmp() {
+        let m1 = Move::new(3, Player::P1, EQUAL, 2);
+        let m2 = Move::new(0, Player::P1, EQUAL, 2);
+        assert_eq!(true, m1 > m2);
+        let m1 = Move::new(3, Player::P1, MIN, 10);
+        let m2 = Move::new(0, Player::P1, MIN, 2);
+        assert_eq!(true, m1 > m2);
+        let m1 = Move::new(3, Player::P1, MAX, 10);
+        let m2 = Move::new(0, Player::P1, MAX, 2);
+        assert_eq!(true, m1 < m2);
+    }
+}

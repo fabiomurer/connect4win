@@ -143,9 +143,9 @@ impl Board {
     pub fn legal_moves(&self) -> Vec<u8> {
         let mut v: Vec<u8> = Vec::new();
         let spaces = self.bitboard.get_space_array();
-        for i in spaces {
-            if i > 0 {
-                v.push(u8::try_from(i).unwrap());
+        for (col, i) in spaces.iter().enumerate() {
+            if *i > 0 {
+                v.push(u8::try_from(col).unwrap());
             }
         }
         v

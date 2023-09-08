@@ -20,7 +20,7 @@ pub struct Table {
     table: Box<[Entry]>
 }
 
-const default_size: usize = 100_000;
+const DEFAULT_SIZE: usize = 100_000;
 
 
 impl Table {
