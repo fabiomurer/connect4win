@@ -134,9 +134,9 @@ impl Board {
         }
         
         let col = self.movestack.pop_move();
-        let row = ROW - self.bitboard.get_space(col as u64);
-
         self.bitboard.unmake_move(col as u64, &self.player);
+
+        let row = ROW - self.bitboard.get_space(col as u64);
         self.scoreboard.unmake_move(row as usize, col as usize, &self.player);
     }
 

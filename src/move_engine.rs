@@ -239,6 +239,6 @@ mod tests {
     fn ml() {
         let mut b = Board::new();
         let ml = Engine::move_sort(&mut b);
-        println!("{:?}", ml)
+        assert_eq!(ml, [3, 4, 2, 5, 1, 6, 0])
     }
 }
