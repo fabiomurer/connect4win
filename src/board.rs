@@ -1,7 +1,6 @@
-use crate::bit_board;
-use crate::bit_board::BitBoard;
-use crate::score_board;
-use std::collections::LinkedList;
+use crate::bit_board::*;
+use crate::score_board::*;
+use std::collections::*;
 use std::cmp::Ordering;
 use crate::score::*;
 
@@ -89,8 +88,8 @@ impl MoveStack {
 #[derive(Clone)]
 pub struct Board {
     movestack: MoveStack,
-    bitboard: bit_board::BitBoard,
-    scoreboard: score_board::ScoreBoard,
+    bitboard: BitBoard,
+    scoreboard: ScoreBoard,
     gamestate: GameState,
     player: Player,
 }
@@ -161,8 +160,8 @@ impl Board {
     pub fn new() -> Board {
         Board { 
             movestack: MoveStack::new(), 
-            bitboard: bit_board::BitBoard::new(),
-            scoreboard: score_board::ScoreBoard::new(), 
+            bitboard: BitBoard::new(),
+            scoreboard: ScoreBoard::new(), 
             gamestate: GameState::OPEN, 
             player: Player::P1 
         }
