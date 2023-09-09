@@ -66,53 +66,32 @@ impl Engine {
                         Player::P1 => {
                             eval = MIN;
                             for m in moves {
-                                match self.timer.check() {
-                                    Ok(_) => {
-                                        board.make_move(m);
-                                        match self.alpha_beta(board, alpha, beta, depth - 1) {
-                                            Ok(newscore) => {
-                                                eval = eval.max(newscore);
-                                                alpha = alpha.max(eval);
-                                                board.unmake_move();
-        
-                                                if alpha > beta {
-                                                    break;
-                                                }
-                                            },
-                                            Err(TimeoutError) => {
-                                                return Err(TimeoutError);
-                                            }
-                                        }
-                                    },
-                                    Err(TimeoutError) => {
-                                        return Err(TimeoutError);
-                                    }
+                                self.timer.check()?;
+
+                                board.make_move(m);
+                                let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
+                                board.unmake_move();
+
+                                eval = eval.max(newscore);
+                                alpha = alpha.max(eval);
+                                if alpha > beta {
+                                    break;
                                 }
                             }
                         },
                         Player::P2 => {
                             eval = MAX;
                             for m in moves {
-                                match self.timer.check() {
-                                    Ok(_) => {
-                                        board.make_move(m);
-                                        match self.alpha_beta(board, alpha, beta, depth - 1) {
-                                            Ok(newscore) => {
-                                                beta = beta.min(newscore);
-                                                board.unmake_move();
+                                self.timer.check()?;
 
-                                                if alpha > beta {
-                                                    break;
-                                                }
-                                            },
-                                            Err(TimeoutError) => {
-                                                return Err(TimeoutError);
-                                            }
-                                        }
-                                    },
-                                    Err(TimeoutError) => {
-                                        return Err(TimeoutError);
-                                    }
+                                board.make_move(m);
+                                let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
+                                board.unmake_move();
+
+                                eval = eval.min(newscore);
+                                beta = beta.min(eval);
+                                if alpha > beta {
+                                    break;
                                 }
                             }
                         }
@@ -134,66 +113,42 @@ impl Engine {
         match board.player() {
             Player::P1 => {
                 for m in prev_ml {
-                    match self.timer.check() {
-                        Ok(_) => {
-                            match m.score().state {
-                                GameState::OPEN => {
-                                    board.make_move(m.col());
-                                    match self.alpha_beta(board, alpha, beta, depth - 1) {
-                                        Ok(newscore) => {
-                                            out.push(Move::new(m.col(), m.player(), newscore, depth));
-                                            alpha = alpha.max(newscore);
-                                            board.unmake_move();
-                                        },
-                                        Err(TimeoutError) => {
-                                            return Err(TimeoutError);
-                                        }
-                                    }
-                                },
-                                _ => {
-                                    out.push(m.clone());
-                                }
-                            }
-                            return Ok(out);
+                    self.timer.check()?;
+                    match m.score().state {
+                        GameState::OPEN => {
+                            board.make_move(m.col());
+                            let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
+                            board.unmake_move();
+
+                            out.push(Move::new(m.col(), m.player(), newscore, depth));
+                            alpha = alpha.max(newscore);
                         },
-                        Err(TimeoutError) => {
-                            return Err(TimeoutError);
+                        _ => {
+                            out.push(m.clone());
                         }
                     }
                 }
             },
             Player::P2 => {
                 for m in prev_ml {
-                    match self.timer.check() {
-                        Ok(_) => {
-                            match m.score().state {
-                                GameState::OPEN => {
-                                    board.make_move(m.col());
-                                    match self.alpha_beta(board, alpha, beta, depth - 1) {
-                                        Ok(newscore) => {
-                                            out.push(Move::new(m.col(), m.player(), newscore, depth));
-                                            beta = beta.min(newscore);
-                                            board.unmake_move();
-                                        },
-                                        Err(TimeoutError) => {
-                                            return Err(TimeoutError);
-                                        }
-                                    }
-                                },
-                                _ => {
-                                    out.push(m.clone());
-                                }
-                            }
-                            return Ok(out);
+                    self.timer.check()?;
+                    match m.score().state {
+                        GameState::OPEN => {
+                            board.make_move(m.col());
+                            let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
+                            board.unmake_move();
+
+                            out.push(Move::new(m.col(), m.player(), newscore, depth));
+                            beta = beta.min(newscore);
                         },
-                        Err(TimeoutError) => {
-                            return Err(TimeoutError);
+                        _ => {
+                            out.push(m.clone());
                         }
                     }
                 }
             }
         }
-        return Err(TimeoutError)
+        return Ok(out);
     }
 
     fn init_move_array(board: &Board) -> Vec<Move> {
