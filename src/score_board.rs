@@ -180,9 +180,7 @@ impl ScoreBoard {
                     let mut kk = j;
                     for k in i..(i+CONNECT) {
                         sbt[k as usize][kk as usize].push_back(n);
-                        if kk > 0{
-                            kk -= 1;
-                        }
+                        kk = kk.saturating_sub(1);
                     }
                     n += 1;
                 }

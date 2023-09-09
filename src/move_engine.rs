@@ -40,12 +40,11 @@ impl Engine {
     }
 
     pub fn alpha_beta(&mut self, board: &mut Board, mut alpha: Score, mut beta: Score, depth: u8) -> Result<Score, TimeoutError> {
-        let saved_score: Option<Score>;
-        if depth >= 2 {
-            saved_score = self.table.get(&board.bitboard());
+        let saved_score: Option<Score> = if depth >= 2 {
+            self.table.get(&board.bitboard())
         } else {
-            saved_score = None;
-        }
+            None
+        };
 
         match  saved_score {
             Some(score) => Ok(score),
@@ -53,7 +52,7 @@ impl Engine {
                 let moves: Vec<u8>;
                 let mut eval: Score;
 
-                if depth <= 0 || board.gamestate() != GameState::OPEN {
+                if depth == 0 || board.gamestate() != GameState::Open {
                     return Ok(board.evaluate());
                 } else {
                     if depth >= 1 {
@@ -100,7 +99,7 @@ impl Engine {
                 if depth >= 2 {
                     self.table.set(board.bitboard(), eval);
                 }
-                return Ok(eval);
+                Ok(eval)
             }
         }
     }
@@ -115,7 +114,7 @@ impl Engine {
                 for m in prev_ml {
                     self.timer.check()?;
                     match m.score().state {
-                        GameState::OPEN => {
+                        GameState::Open => {
                             board.make_move(m.col());
                             let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
                             board.unmake_move();
@@ -124,7 +123,7 @@ impl Engine {
                             alpha = alpha.max(newscore);
                         },
                         _ => {
-                            out.push(m.clone());
+                            out.push(*m);
                         }
                     }
                 }
@@ -133,7 +132,7 @@ impl Engine {
                 for m in prev_ml {
                     self.timer.check()?;
                     match m.score().state {
-                        GameState::OPEN => {
+                        GameState::Open => {
                             board.make_move(m.col());
                             let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
                             board.unmake_move();
@@ -142,13 +141,13 @@ impl Engine {
                             beta = beta.min(newscore);
                         },
                         _ => {
-                            out.push(m.clone());
+                            out.push(*m);
                         }
                     }
                 }
             }
         }
-        return Ok(out);
+        Ok(out)
     }
 
     fn init_move_array(board: &Board) -> Vec<Move> {
@@ -182,7 +181,7 @@ impl Engine {
                 }
             }
         }
-        return bestmove;
+        bestmove
     }
 }
 

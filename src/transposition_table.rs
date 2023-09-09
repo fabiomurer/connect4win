@@ -4,17 +4,12 @@ use std::hash::Hasher;
 use crate::bit_board::*;
 use crate::score::*;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Entry {
     score: Score,
     key: BitBoard
 }
 
-impl Default for Entry {
-    fn default() -> Self {
-        Entry { score: Default::default() , key: Default::default() }   
-    }
-}
 pub struct Table {
     size: usize,
     table: Box<[Entry]>
@@ -26,8 +21,8 @@ const DEFAULT_SIZE: usize = 100_000;
 impl Table {
     pub fn new(size: usize) -> Table {
         
-        return Table { 
-            size: size, 
+        Table { 
+            size, 
             table: vec![Default::default(); size].into_boxed_slice(),
         }
     }
@@ -40,21 +35,21 @@ impl Table {
         let mut s = DefaultHasher::new();
         key.hash(&mut s);
         let n: usize = s.finish() as usize;
-        return n % self.size
+        n % self.size
     }
 
     pub fn get(&self, key: &BitBoard) -> Option<Score> {
         let index = self.get_index(key);
         if self.table[index].key == *key {
-            return Some(self.table[index].score.clone())
+            Some(self.table[index].score)
         } else {
-            return  None;
+            None
         }
     }
 
     pub fn set(&mut self, key: BitBoard, score: Score) {
         let index = self.get_index(&key);
-        let entry: Entry = Entry { score: score, key: key };
+        let entry: Entry = Entry { score, key };
         self.table[index] = entry;
     }
 }

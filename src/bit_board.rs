@@ -19,17 +19,13 @@ impl Default for BitBoard {
 const SIZE_SPACE: u64 = 3;
 impl BitBoard {
     pub fn is_full(&self) -> bool {
-        if (self.board & 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000) == 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000 {
-            true
-        } else {
-            false
-        }
+        (self.board & 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000) == 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000
     }
     pub fn get_space(&self, col: u64) -> u64 {
         let offset = COL * ROW + SIZE_SPACE * col;
         let mut bits: u64 = 0b111 << offset;
-        bits = self.board & bits;
-        bits = bits >> offset;
+        bits &= self.board;
+        bits >>= offset;
         bits
     }
     pub fn get_space_array(&self) -> [u64; 7] {

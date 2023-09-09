@@ -35,13 +35,13 @@ impl Eq for Move {}
 
 impl PartialEq for Move {
     fn eq(&self, other: &Self) -> bool {
-        return self == other;
+        self == other
     }
 }
 
 impl PartialOrd for Move {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        return Some(self.cmp(other));
+        Some(self.cmp(other))
     }
 }
 
@@ -49,23 +49,21 @@ impl Ord for Move {
     fn cmp(&self, other: &Self) -> Ordering {
         let compare_score = self.score.cmp(&other.score);
 
-        if compare_score == Ordering::Equal && self.score.state == GameState::OPEN {
+        if compare_score == Ordering::Equal && self.score.state == GameState::Open {
             let col: i32 = 7;
             let half_row = col / 2;
             let distance_a = ((self.col as i32) - half_row).abs();
             let distance_b = ((other.col as i32) - half_row).abs();
-            return distance_b.cmp(&distance_a);
+            distance_b.cmp(&distance_a)
+        } else if compare_score != Ordering::Equal {
+            compare_score
         } else {
-            if compare_score != Ordering::Equal {
-                return compare_score;
-            } else {
-                let compare_depth = self.depth.cmp(&other.depth);
-                match self.score.state {
-                    GameState::OPEN  => Ordering::Equal,
-                    GameState::DRAW  => compare_depth,
-                    GameState::WINP1 => compare_depth.reverse(),
-                    GameState::WINP2 => compare_depth,
-                }
+            let compare_depth = self.depth.cmp(&other.depth);
+            match self.score.state {
+                GameState::Open  => Ordering::Equal,
+                GameState::Draw  => compare_depth,
+                GameState::WinP1 => compare_depth.reverse(),
+                GameState::WinP2 => compare_depth,
             }
         }
     }
