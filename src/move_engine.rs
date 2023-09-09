@@ -172,9 +172,9 @@ impl Engine {
                     ml.sort();
                     if board.player() == Player::P1 {
                         ml.reverse();
-                        movelist = ml;
-                        bestmove = movelist[0];
                     }
+                    movelist = ml;
+                    bestmove = movelist[0];
                 },
                 Err(TimeoutError) => {
                     return bestmove;
