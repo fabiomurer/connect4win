@@ -68,19 +68,19 @@ pub enum Player {
 
 #[derive(Clone)]
 struct MoveStack {
-    moves: LinkedList<u8>,
+    moves: Vec<u8>,
 }
 
 impl MoveStack {
     pub fn push_move(&mut self, col: u8) {
-        self.moves.push_front(col);
+        self.moves.push(col);
     }
     pub fn pop_move(&mut self) -> u8 {
-        self.moves.pop_front().unwrap()
+        self.moves.pop().unwrap()
     }
     pub fn new() -> MoveStack {
         MoveStack {
-            moves: LinkedList::new(),
+            moves: Vec::new()
         }
     }
 }
@@ -151,10 +151,7 @@ impl Board {
     }
 
     pub fn evaluate(&self) -> Score {
-        Score { 
-            score: self.scoreboard.total_score(), 
-            state: self.gamestate.clone(),
-        }
+        Score::new(self.scoreboard.total_score(), self.gamestate)
     }
 
     pub fn new() -> Board {
@@ -177,5 +174,23 @@ impl Board {
 
     pub fn gamestate(&self) -> GameState {
         self.gamestate
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn munm() {
+        let mut b = Board::new();
+        b.make_move(3);
+        b.unmake_move();
+
+        assert_eq!(b.bitboard(), BitBoard::new());
+        assert_eq!(b.movestack.moves.len(), 0);
+        assert_eq!(b.scoreboard.total_score(), 0);
+        assert_eq!(b.player, Player::P1);
+        assert_eq!(b.gamestate, GameState::OPEN);
     }
 }

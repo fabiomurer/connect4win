@@ -5,7 +5,7 @@ use crate::board::*;
 const INIT_BITBOARD: u64 =
     0b0_110_110_110_110_110_110_110_000000000000000000000000000000000000000000;
 
-#[derive(Clone, Copy, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
 pub struct BitBoard {
     board: u64,
 }

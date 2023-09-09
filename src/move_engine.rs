@@ -53,15 +53,15 @@ impl Engine {
                 let moves: Vec<u8>;
                 let mut eval: Score;
 
-                if depth >= 1 {
-                    moves = Self::move_sort(board);
-                } else {
-                    moves = board.legal_moves();
-                }
-
                 if depth <= 0 || board.gamestate() != GameState::OPEN {
                     return Ok(board.evaluate());
                 } else {
+                    if depth >= 1 {
+                        moves = Self::move_sort(board);
+                    } else {
+                        moves = board.legal_moves();
+                    }
+
                     match board.player() {
                         Player::P1 => {
                             eval = MIN;
