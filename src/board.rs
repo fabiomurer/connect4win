@@ -158,6 +158,10 @@ impl Board {
         7*6 - (self.movestack.moves.len() as u8)
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.bitboard.is_empty()
+    }
+
     pub fn new() -> Board {
         Board { 
             movestack: MoveStack::new(), 

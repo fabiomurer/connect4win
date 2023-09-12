@@ -21,6 +21,9 @@ impl BitBoard {
     pub fn is_full(&self) -> bool {
         (self.board & 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000) == 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000
     }
+    pub fn is_empty(&self) -> bool {
+        self.board == INIT_BITBOARD
+    }
     pub fn get_space(&self, col: u64) -> u64 {
         let offset = COL * ROW + SIZE_SPACE * col;
         let mut bits: u64 = 0b111 << offset;

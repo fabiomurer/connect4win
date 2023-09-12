@@ -165,6 +165,11 @@ impl Engine {
         let mut movelist = Self::init_move_array(&tb);
         let mut bestmove: Move = movelist[0];
         let cells: u8 = board.free_cells();
+
+        if board.is_empty() {
+            return Move::new(3, board.player(), EQUAL, 0)
+        }
+
         for i in 1..cells {
             self.table.clean();
             match self.move_list(&mut tb, &movelist, i) {
@@ -175,12 +180,6 @@ impl Engine {
                     }
                     movelist = ml;
                     bestmove = movelist[0];
-
-                    println!("Move list");
-                    for m in &movelist {
-                        println!("{:?}", m);
-                    }
-                    println!("");
                     
                 },
                 Err(TimeoutError) => {

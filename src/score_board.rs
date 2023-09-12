@@ -67,7 +67,7 @@ impl ScoreBoard {
             let ps = sc.score;
             sc.add(player);
 
-            if sc.score == CONNECT as i32{
+            if sc.score.abs() == CONNECT as i32{
                 win = true;
             }
 
@@ -207,6 +207,11 @@ mod tests {
         ss.make_move(0, 0, &crate::board::Player::P1);
         assert_eq!(ss.total_score, 3);
         ss.make_move(0, 6, &crate::board::Player::P2);
+        assert_eq!(ss.total_score, 0);
+        let mut ss: ScoreBoard = ScoreBoard::new();
+        ss.make_move(0, 0, &crate::board::Player::P2);
+        assert_eq!(ss.total_score, -3);
+        ss.make_move(0, 6, &crate::board::Player::P1);
         assert_eq!(ss.total_score, 0)   
     }
 
@@ -216,5 +221,20 @@ mod tests {
         ss.make_move(0, 0, &crate::board::Player::P1);
         ss.unmake_move(0, 0, &crate::board::Player::P1);
         assert_eq!(ss.total_score, 0)  
+    }
+
+    #[test]
+    fn win() {
+        let mut ss: ScoreBoard = ScoreBoard::new();
+        ss.make_move(0, 0, &crate::board::Player::P1);
+        ss.make_move(1, 0, &crate::board::Player::P1);
+        ss.make_move(2, 0, &crate::board::Player::P1);
+        assert!(ss.make_move(3, 0, &crate::board::Player::P1));
+
+        let mut ss: ScoreBoard = ScoreBoard::new();
+        ss.make_move(0, 0, &crate::board::Player::P2);
+        ss.make_move(1, 0, &crate::board::Player::P2);
+        ss.make_move(2, 0, &crate::board::Player::P2);
+        assert!(ss.make_move(3, 0, &crate::board::Player::P2));
     }
 }
