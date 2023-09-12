@@ -175,19 +175,18 @@ impl Engine {
                     }
                     movelist = ml;
                     bestmove = movelist[0];
-                },
-                Err(TimeoutError) => {
+
                     println!("Move list");
                     for m in &movelist {
                         println!("{:?}", m);
                     }
+                    println!("");
+                    
+                },
+                Err(TimeoutError) => {
                     return bestmove;
                 }
             }
-        }
-        println!("Move list");
-        for m in &movelist {
-            println!("{:?}", m);
         }
         bestmove
     }
