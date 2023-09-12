@@ -41,7 +41,7 @@ impl PartialOrd for Score {
 
 impl Ord for Score {
     fn cmp(&self, other: &Self) -> Ordering {
-        if self.state == other.state {
+        if self.state == GameState::Open && other.state == GameState::Open {
             self.score.cmp(&other.score)
         } else {
             self.state.cmp(&other.state)
@@ -86,5 +86,9 @@ mod tests {
         let s1 = Score { score: 12, state: GameState::Draw };
         let s2 = Score { score: 0, state: GameState::Open };
         assert_eq!(s2, s2.max(s1));
+
+        let s1 = Score { score: -4, state: GameState::WinP1 };
+        let s2 = Score { score: -3, state: GameState::WinP1 };
+        assert_eq!(Ordering::Equal, s2.cmp(&s1));
     }
 }

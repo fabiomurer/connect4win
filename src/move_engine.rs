@@ -164,7 +164,7 @@ impl Engine {
         let mut tb: Board = board.clone();
         let mut movelist = Self::init_move_array(&tb);
         let mut bestmove: Move = movelist[0];
-        let cells: u8 = 7*6;
+        let cells: u8 = board.free_cells();
         for i in 1..cells {
             self.table.clean();
             match self.move_list(&mut tb, &movelist, i) {
@@ -177,9 +177,17 @@ impl Engine {
                     bestmove = movelist[0];
                 },
                 Err(TimeoutError) => {
+                    println!("Move list");
+                    for m in &movelist {
+                        println!("{:?}", m);
+                    }
                     return bestmove;
                 }
             }
+        }
+        println!("Move list");
+        for m in &movelist {
+            println!("{:?}", m);
         }
         bestmove
     }

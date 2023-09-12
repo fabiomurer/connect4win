@@ -154,6 +154,10 @@ impl Board {
         Score::new(self.scoreboard.total_score(), self.gamestate)
     }
 
+    pub fn free_cells(&self) -> u8 {
+        7*6 - (self.movestack.moves.len() as u8)
+    }
+
     pub fn new() -> Board {
         Board { 
             movestack: MoveStack::new(), 

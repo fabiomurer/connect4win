@@ -86,5 +86,9 @@ mod tests {
         let m1 = Move::new(3, Player::P1, MAX, 10);
         let m2 = Move::new(0, Player::P1, MAX, 2);
         assert_eq!(true, m1 < m2);
+
+        let m1 = Move::new(4, Player::P2, Score { score: -4, state: GameState::WinP1 }, 2);
+        let m2 = Move::new(6, Player::P2, Score { score: -3, state: GameState::WinP1 }, 18);
+        assert_eq!(true, m1.cmp(&m2) == Ordering::Greater);
     }
 }
