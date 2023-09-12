@@ -10,7 +10,7 @@ mod transposition_table;
 mod timer;
 mod move_engine;
 fn main() {
-    println!("Hello, world!");
+    /*
     let mut board = board::Board::new();
     let mut e = move_engine::Engine::new(3, 100_000);
 
@@ -40,4 +40,11 @@ fn main() {
         board.bitboard().print();
     }
     println!("{:?}", board.gamestate());
+
+    */
+    let mut board = board::Board::new();
+    board.make_move(3);
+    let mut e = move_engine::Engine::new(3, 100_000);
+    let m = e.iterative_depening(&board);
+    println!("{:?}", m);
 }
