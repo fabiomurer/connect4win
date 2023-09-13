@@ -25,10 +25,6 @@ impl Move {
     pub fn player(&self) -> Player {
         self.player
     }
-
-    pub fn depth(&self) -> u8 {
-        self.depth
-    }
 }
 
 impl Eq for Move {}

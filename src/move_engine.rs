@@ -20,8 +20,8 @@ impl Engine {
 
     fn move_sort(board: &mut Board) -> Vec<u8> {
         let v = board.legal_moves();
-        let mut mv: Vec<Move> = Vec::new();
-        let mut out: Vec<u8> = Vec::new();
+        let mut mv: Vec<Move> = Vec::with_capacity(COL as usize);
+        let mut out: Vec<u8> = Vec::with_capacity(COL as usize);
 
         for m in v {
             board.make_move(m);
@@ -40,7 +40,7 @@ impl Engine {
     }
 
     pub fn alpha_beta(&mut self, board: &mut Board, mut alpha: Score, mut beta: Score, depth: u8) -> Result<Score, TimeoutError> {
-        let saved_score: Option<Score> = if depth >= 2 {
+        let saved_score: Option<Score> = if depth >= 1 {
             self.table.get(&board.bitboard())
         } else {
             None
@@ -96,7 +96,7 @@ impl Engine {
                         }
                     }
                 }
-                if depth >= 2 {
+                if depth >= 1 {
                     self.table.set(board.bitboard(), eval);
                 }
                 Ok(eval)
@@ -107,7 +107,7 @@ impl Engine {
     fn move_list(&mut self, board: &mut Board, prev_ml: &Vec<Move>, depth: u8) -> Result<Vec<Move>, TimeoutError> {
         let mut alpha = MIN;
         let mut beta = MAX;
-        let mut out: Vec<Move> = Vec::new();
+        let mut out: Vec<Move> = Vec::with_capacity(COL as usize);
 
         match board.player() {
             Player::P1 => {
@@ -151,7 +151,7 @@ impl Engine {
     }
 
     fn init_move_array(board: &Board) -> Vec<Move> {
-        let mut out: Vec<Move> = Vec::new();
+        let mut out: Vec<Move> = Vec::with_capacity(COL as usize);
         let cols = board.legal_moves();
         for c in cols {
             out.push(Move::new(c, board.player(), EQUAL , 0));
@@ -200,5 +200,19 @@ mod tests {
         let mut b = Board::new();
         let ml = Engine::move_sort(&mut b);
         assert_eq!(ml, [3, 4, 2, 5, 1, 6, 0])
+    }
+
+    #[test]
+    fn timeengine() {
+        use std::time::Instant;
+
+        let mut board = Board::new();
+        board.make_move(3);
+        let mut e = Engine::new(3, 100_000);
+        
+        let start = Instant::now();
+        _ = e.alpha_beta(&mut board, MIN, MAX, 12);
+        let duration = start.elapsed();
+        println!("Time elapsed in alpha_beta is: {:?}", duration);
     }
 }

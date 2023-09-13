@@ -15,9 +15,6 @@ pub struct Table {
     table: Box<[Entry]>
 }
 
-const DEFAULT_SIZE: usize = 100_000;
-
-
 impl Table {
     pub fn new(size: usize) -> Table {
         

@@ -1,6 +1,5 @@
 use crate::bit_board::*;
 use crate::score_board::*;
-use std::collections::*;
 use std::cmp::Ordering;
 use crate::score::*;
 
@@ -80,7 +79,7 @@ impl MoveStack {
     }
     pub fn new() -> MoveStack {
         MoveStack {
-            moves: Vec::new()
+            moves: Vec::with_capacity((COL * ROW) as usize)
         }
     }
 }
@@ -140,7 +139,7 @@ impl Board {
     }
 
     pub fn legal_moves(&self) -> Vec<u8> {
-        let mut v: Vec<u8> = Vec::new();
+        let mut v: Vec<u8> = Vec::with_capacity(COL as usize);
         let spaces = self.bitboard.get_space_array();
         for (col, i) in spaces.iter().enumerate() {
             if *i > 0 {
