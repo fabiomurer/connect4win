@@ -9,3 +9,7 @@ edition = "2021"
 debug = true
 
 [dependencies]
+yew = { version = "0.20", features = ["csr"] }
+
+#[target.'cfg(target_family = "wasm")'.dependencies]
+#yew = { version = "0.20", features = ["csr"] }
