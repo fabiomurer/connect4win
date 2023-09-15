@@ -46,6 +46,7 @@ fn GameBoard(props: &BoardProps) -> Html {
     let  arr = board_to_arr(&props.board);
 
     html! {
+        <>
         <table style="width:500px">
             {
                 arr.into_iter().map(|r| {
@@ -54,9 +55,9 @@ fn GameBoard(props: &BoardProps) -> Html {
                             {
                                 r.into_iter().map(|c| {
                                     match c {
-                                        CellType::Empty => html!{<th style="background-color: blue">{""}</th>},
-                                        CellType::P1 => html!{<th style="background-color: red">{""}</th>},
-                                        CellType::P2 => html!{<th style="background-color: yellow">{""}</th>}
+                                        CellType::Empty => html!{<td style="background-color: blue">{""}</td>},
+                                        CellType::P1 => html!{<td style="background-color: red">{""}</td>},
+                                        CellType::P2 => html!{<td style="background-color: yellow">{""}</td>}
                                     }
                                 }).collect::<Html>()
                             }
@@ -66,11 +67,14 @@ fn GameBoard(props: &BoardProps) -> Html {
                 }).collect::<Html>()
             }
         </table>
+        <p>{format!("game state: {:?}", props.board.gamestate())}</p>
+        </>
     }
 }
 
 enum Msg {
-    Start,
+    NewGame,
+    Bestmove,
     Move(u8),
 }
 
@@ -80,6 +84,8 @@ struct App {
     m: Move,
 }
 
+
+
 impl Component for App {
     type Message = Msg;
     type Properties = ();
@@ -88,10 +94,16 @@ impl Component for App {
         Self { engine: Engine::new(3, 100_000), board: Board::new(), m: Move::new(0, Player::P1, EQUAL , 0) }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::Start => {
+            Msg::NewGame => {
+                self.board = Board::new();
+                self.m = Move::new(0, Player::P1, EQUAL , 0);
+                true
+            }
+            Msg::Bestmove => {
                 self.m = self.engine.iterative_depening(&self.board);
+                self.board.make_move(self.m.col());
                 true
             }
             Msg::Move(col) => {
@@ -104,15 +116,22 @@ impl Component for App {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <div>
-                <button onclick={ctx.link().callback(|_| Msg::Start)}>{ "start" }</button>
-                <button onclick={ctx.link().callback(|_| Msg::Move(0))}>{ "move 1" }</button>
-                <button onclick={ctx.link().callback(|_| Msg::Move(1))}>{ "move 2" }</button>
-                <button onclick={ctx.link().callback(|_| Msg::Move(2))}>{ "move 3" }</button>
-                <button onclick={ctx.link().callback(|_| Msg::Move(3))}>{ "move 4" }</button>
-                <button onclick={ctx.link().callback(|_| Msg::Move(4))}>{ "move 5" }</button>
-                <button onclick={ctx.link().callback(|_| Msg::Move(5))}>{ "move 6" }</button>
-                <button onclick={ctx.link().callback(|_| Msg::Move(6))}>{ "move 7" }</button>
-                <p>{ self.m.col() }</p>
+                <button onclick={ctx.link().callback(|_| Msg::NewGame)}>{ "new game" }</button>
+                <button onclick={ctx.link().callback(|_| Msg::Bestmove)}>{ "play best move" }</button>
+                <p>{ self.m }</p>
+                {
+                    html! {
+                        <table style="width:500px">
+                            <tr>
+                                {
+                                    (0..7).map(|num| {
+                                        html! { <td><button onclick={ctx.link().callback(move |_| Msg::Move(num.clone()))}> { "move" }</button></td>}
+                                    }).collect::<Html>()
+                                }
+                            </tr>
+                        </table>
+                    }
+                }
                 <GameBoard board={self.board.clone()}/>
             </div>
         }
