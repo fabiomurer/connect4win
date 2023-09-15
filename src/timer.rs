@@ -1,4 +1,8 @@
+#[cfg(not(target_family = "wasm"))]
 use std::time::{Duration, Instant};
+#[cfg(target_family = "wasm")]
+use instant::{Duration, Instant};
+
 use std::fmt;
 
 #[derive(Debug, Clone)]

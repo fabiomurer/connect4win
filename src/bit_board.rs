@@ -92,6 +92,10 @@ impl BitBoard {
             board: INIT_BITBOARD,
         }
     }
+
+    pub fn board(&self) -> u64 {
+        self.board
+    }
 }
 
 #[cfg(test)]

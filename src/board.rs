@@ -65,7 +65,7 @@ pub enum Player {
     P2,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 struct MoveStack {
     moves: Vec<u8>,
 }
@@ -84,7 +84,7 @@ impl MoveStack {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Board {
     movestack: MoveStack,
     bitboard: BitBoard,

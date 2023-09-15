@@ -1,7 +1,7 @@
 use crate::board::*;
 use std::collections::LinkedList;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ScoreSet {
     score: i32,
     p1: u32,
@@ -46,7 +46,7 @@ impl ScoreSet {
 
 const NSC: usize = 207; // chissà se è giosto
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct ScoreBoard {
     total_score: i32,
     scoreboard: [[LinkedList<u32>; COL as usize]; ROW as usize],
