@@ -1,19 +1,18 @@
 use crate::board::*;
-use crate::score::*;
-use crate::transposition_table::*;
 use crate::r#move::*;
+use crate::score::*;
 use crate::timer::*;
-
+use crate::transposition_table::*;
 
 pub struct Engine {
     timer: Timer,
     table: Table,
-} 
+}
 
 impl Engine {
     pub fn new(seconds: u64, table_size: usize) -> Engine {
         Engine {
-            timer: Timer::new(seconds), 
+            timer: Timer::new(seconds),
             table: Table::new(table_size),
         }
     }
@@ -39,14 +38,20 @@ impl Engine {
         out
     }
 
-    pub fn alpha_beta(&mut self, board: &mut Board, mut alpha: Score, mut beta: Score, depth: u8) -> Result<Score, TimeoutError> {
+    pub fn alpha_beta(
+        &mut self,
+        board: &mut Board,
+        mut alpha: Score,
+        mut beta: Score,
+        depth: u8,
+    ) -> Result<Score, TimeoutError> {
         let saved_score: Option<Score> = if depth >= 1 {
             self.table.get(&board.bitboard())
         } else {
             None
         };
 
-        match  saved_score {
+        match saved_score {
             Some(score) => Ok(score),
             None => {
                 let moves: Vec<u8>;
@@ -77,7 +82,7 @@ impl Engine {
                                     break;
                                 }
                             }
-                        },
+                        }
                         Player::P2 => {
                             eval = MAX;
                             for m in moves {
@@ -104,7 +109,12 @@ impl Engine {
         }
     }
 
-    fn move_list(&mut self, board: &mut Board, prev_ml: &Vec<Move>, depth: u8) -> Result<Vec<Move>, TimeoutError> {
+    fn move_list(
+        &mut self,
+        board: &mut Board,
+        prev_ml: &Vec<Move>,
+        depth: u8,
+    ) -> Result<Vec<Move>, TimeoutError> {
         let mut alpha = MIN;
         let mut beta = MAX;
         let mut out: Vec<Move> = Vec::with_capacity(COL as usize);
@@ -121,13 +131,13 @@ impl Engine {
 
                             out.push(Move::new(m.col(), m.player(), newscore, depth));
                             alpha = alpha.max(newscore);
-                        },
+                        }
                         _ => {
                             out.push(*m);
                         }
                     }
                 }
-            },
+            }
             Player::P2 => {
                 for m in prev_ml {
                     self.timer.check()?;
@@ -139,7 +149,7 @@ impl Engine {
 
                             out.push(Move::new(m.col(), m.player(), newscore, depth));
                             beta = beta.min(newscore);
-                        },
+                        }
                         _ => {
                             out.push(*m);
                         }
@@ -154,7 +164,7 @@ impl Engine {
         let mut out: Vec<Move> = Vec::with_capacity(COL as usize);
         let cols = board.legal_moves();
         for c in cols {
-            out.push(Move::new(c, board.player(), EQUAL , 0));
+            out.push(Move::new(c, board.player(), EQUAL, 0));
         }
         out
     }
@@ -167,7 +177,7 @@ impl Engine {
         let cells: u8 = board.free_cells();
 
         if board.is_empty() {
-            return Move::new(3, board.player(), EQUAL, 0)
+            return Move::new(3, board.player(), EQUAL, 0);
         }
 
         for i in 1..cells {
@@ -180,8 +190,7 @@ impl Engine {
                     }
                     movelist = ml;
                     bestmove = movelist[0];
-                    
-                },
+                }
                 Err(TimeoutError) => {
                     return bestmove;
                 }
@@ -209,7 +218,7 @@ mod tests {
         let mut board = Board::new();
         board.make_move(3);
         let mut e = Engine::new(3, 100_000);
-        
+
         let start = Instant::now();
         _ = e.alpha_beta(&mut board, MIN, MAX, 12);
         let duration = start.elapsed();

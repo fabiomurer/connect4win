@@ -8,16 +8,30 @@ pub struct Score {
 }
 
 impl Score {
-    pub fn new(score: i32, state: GameState) -> Self { Self { score, state } }
+    pub fn new(score: i32, state: GameState) -> Self {
+        Self { score, state }
+    }
 }
 
-pub const MAX: Score = Score { score: 0, state: GameState::WinP1 };
-pub const MIN: Score = Score { score: 0, state: GameState::WinP2 };
-pub const EQUAL: Score = Score { score: 0, state: GameState::Open };
+pub const MAX: Score = Score {
+    score: 0,
+    state: GameState::WinP1,
+};
+pub const MIN: Score = Score {
+    score: 0,
+    state: GameState::WinP2,
+};
+pub const EQUAL: Score = Score {
+    score: 0,
+    state: GameState::Open,
+};
 
 impl Default for Score {
     fn default() -> Self {
-        Score { score: 0, state: GameState::Open }
+        Score {
+            score: 0,
+            state: GameState::Open,
+        }
     }
 }
 
@@ -49,18 +63,20 @@ impl Ord for Score {
     }
 
     fn max(self, other: Self) -> Self
-        where
-            Self: Sized, {
+    where
+        Self: Sized,
+    {
         if self > other {
             self
         } else {
             other
         }
     }
-    
+
     fn min(self, other: Self) -> Self
-        where
-            Self: Sized, {
+    where
+        Self: Sized,
+    {
         if self < other {
             self
         } else {
@@ -79,16 +95,34 @@ mod tests {
         let s2 = EQUAL;
         assert_eq!(MAX, s1.max(s2));
 
-        let s1 = Score { score: 12, state: GameState::Open };
-        let s2 = Score { score: 0, state: GameState::Open };
+        let s1 = Score {
+            score: 12,
+            state: GameState::Open,
+        };
+        let s2 = Score {
+            score: 0,
+            state: GameState::Open,
+        };
         assert_eq!(s1, s2.max(s1));
 
-        let s1 = Score { score: 12, state: GameState::Draw };
-        let s2 = Score { score: 0, state: GameState::Open };
+        let s1 = Score {
+            score: 12,
+            state: GameState::Draw,
+        };
+        let s2 = Score {
+            score: 0,
+            state: GameState::Open,
+        };
         assert_eq!(s2, s2.max(s1));
 
-        let s1 = Score { score: -4, state: GameState::WinP1 };
-        let s2 = Score { score: -3, state: GameState::WinP1 };
+        let s1 = Score {
+            score: -4,
+            state: GameState::WinP1,
+        };
+        let s2 = Score {
+            score: -3,
+            state: GameState::WinP1,
+        };
         assert_eq!(Ordering::Equal, s2.cmp(&s1));
     }
 }

@@ -1,25 +1,24 @@
-use std::collections::hash_map::DefaultHasher;
-use std::hash::*;
-use std::hash::Hasher;
 use crate::bit_board::*;
 use crate::score::*;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::Hasher;
+use std::hash::*;
 
 #[derive(Clone, Default)]
 pub struct Entry {
     score: Score,
-    key: BitBoard
+    key: BitBoard,
 }
 
 pub struct Table {
     size: usize,
-    table: Box<[Entry]>
+    table: Box<[Entry]>,
 }
 
 impl Table {
     pub fn new(size: usize) -> Table {
-        
-        Table { 
-            size, 
+        Table {
+            size,
             table: vec![Default::default(); size].into_boxed_slice(),
         }
     }

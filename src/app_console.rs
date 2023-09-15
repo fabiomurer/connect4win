@@ -13,7 +13,7 @@ pub fn app() {
     let human = match buf.trim() {
         "p1" => board::Player::P1,
         "p2" => board::Player::P2,
-        _ => panic!("player option not valid")
+        _ => panic!("player option not valid"),
     };
 
     while board.gamestate() == board::GameState::Open {
@@ -21,7 +21,7 @@ pub fn app() {
             let mut buf = String::new();
             io::stdin().read_line(&mut buf).unwrap();
             let col: u8 = buf.trim().parse().unwrap();
-    
+
             board.make_move(col);
         } else {
             let m = e.iterative_depening(&board);

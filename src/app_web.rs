@@ -16,7 +16,7 @@ fn board_to_arr(board: &Board) -> [[CellType; COL as usize]; ROW as usize] {
     let mut arr = [[CellType::Empty; COL as usize]; ROW as usize];
     let bb = board.bitboard();
     let spacearr = bb.get_space_array();
-    
+
     for row in 0..ROW {
         for col in 0..COL {
             let rrow = ROW - row - 1;
@@ -43,7 +43,7 @@ struct BoardProps {
 
 #[function_component]
 fn GameBoard(props: &BoardProps) -> Html {
-    let  arr = board_to_arr(&props.board);
+    let arr = board_to_arr(&props.board);
 
     html! {
         <>
@@ -63,7 +63,7 @@ fn GameBoard(props: &BoardProps) -> Html {
                             }
                         </tr>
                     }
-                    
+
                 }).collect::<Html>()
             }
         </table>
@@ -84,21 +84,23 @@ struct App {
     m: Move,
 }
 
-
-
 impl Component for App {
     type Message = Msg;
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self { engine: Engine::new(3, 100_000), board: Board::new(), m: Move::new(0, Player::P1, EQUAL , 0) }
+        Self {
+            engine: Engine::new(3, 100_000),
+            board: Board::new(),
+            m: Move::new(0, Player::P1, EQUAL, 0),
+        }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::NewGame => {
                 self.board = Board::new();
-                self.m = Move::new(0, Player::P1, EQUAL , 0);
+                self.m = Move::new(0, Player::P1, EQUAL, 0);
                 true
             }
             Msg::Bestmove => {
@@ -136,7 +138,6 @@ impl Component for App {
             </div>
         }
     }
-
 }
 
 pub fn app() {

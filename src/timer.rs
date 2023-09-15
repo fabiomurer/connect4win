@@ -1,18 +1,18 @@
-#[cfg(not(target_family = "wasm"))]
-use std::time::{Duration, Instant};
 #[cfg(target_family = "wasm")]
 use instant::{Duration, Instant};
+#[cfg(not(target_family = "wasm"))]
+use std::time::{Duration, Instant};
 
 use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct Timer {
     duration: Duration,
-    start: Instant
+    start: Instant,
 }
 
 #[derive(Debug)]
-pub struct TimeoutError; 
+pub struct TimeoutError;
 
 impl fmt::Display for TimeoutError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -22,7 +22,10 @@ impl fmt::Display for TimeoutError {
 
 impl Timer {
     pub fn new(seconds: u64) -> Timer {
-        Timer { duration: Duration::new(seconds, 0), start: Instant::now() }
+        Timer {
+            duration: Duration::new(seconds, 0),
+            start: Instant::now(),
+        }
     }
 
     pub fn start(&mut self) {
@@ -54,4 +57,3 @@ mod tests {
         t.check().unwrap();
     }
 }
-

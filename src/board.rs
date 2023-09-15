@@ -1,7 +1,7 @@
 use crate::bit_board::*;
+use crate::score::*;
 use crate::score_board::*;
 use std::cmp::Ordering;
-use crate::score::*;
 
 pub const COL: u64 = 7;
 pub const ROW: u64 = 6;
@@ -23,38 +23,30 @@ impl PartialOrd for GameState {
 impl Ord for GameState {
     fn cmp(&self, other: &Self) -> Ordering {
         match self {
-            GameState::Open => {
-                match other {
-                    GameState::Open  => Ordering::Equal,
-                    GameState::Draw  => Ordering::Greater,
-                    GameState::WinP1 => Ordering::Less,
-                    GameState::WinP2 => Ordering::Greater,
-                }
-            }
-            GameState::Draw => {
-                match other {
-                    GameState::Open  => Ordering::Less,
-                    GameState::Draw  => Ordering::Equal,
-                    GameState::WinP1 => Ordering::Less,
-                    GameState::WinP2 => Ordering::Greater,
-                }
-            }
-            GameState::WinP1 => {
-                match other {
-                    GameState::Open  => Ordering::Greater,
-                    GameState::Draw  => Ordering::Greater,
-                    GameState::WinP1 => Ordering::Equal,
-                    GameState::WinP2 => Ordering::Greater,
-                }
-            }
-            GameState::WinP2 => {
-                match other {
-                    GameState::Open  => Ordering::Less,
-                    GameState::Draw  => Ordering::Less,
-                    GameState::WinP1 => Ordering::Less,
-                    GameState::WinP2 => Ordering::Equal,
-                }
-            }
+            GameState::Open => match other {
+                GameState::Open => Ordering::Equal,
+                GameState::Draw => Ordering::Greater,
+                GameState::WinP1 => Ordering::Less,
+                GameState::WinP2 => Ordering::Greater,
+            },
+            GameState::Draw => match other {
+                GameState::Open => Ordering::Less,
+                GameState::Draw => Ordering::Equal,
+                GameState::WinP1 => Ordering::Less,
+                GameState::WinP2 => Ordering::Greater,
+            },
+            GameState::WinP1 => match other {
+                GameState::Open => Ordering::Greater,
+                GameState::Draw => Ordering::Greater,
+                GameState::WinP1 => Ordering::Equal,
+                GameState::WinP2 => Ordering::Greater,
+            },
+            GameState::WinP2 => match other {
+                GameState::Open => Ordering::Less,
+                GameState::Draw => Ordering::Less,
+                GameState::WinP1 => Ordering::Less,
+                GameState::WinP2 => Ordering::Equal,
+            },
         }
     }
 }
@@ -79,7 +71,7 @@ impl MoveStack {
     }
     pub fn new() -> MoveStack {
         MoveStack {
-            moves: Vec::with_capacity((COL * ROW) as usize)
+            moves: Vec::with_capacity((COL * ROW) as usize),
         }
     }
 }
@@ -106,11 +98,13 @@ impl Board {
         let row = ROW - self.bitboard.get_space(col as u64);
         self.movestack.push_move(col);
         self.bitboard.make_move(col as u64, &self.player);
-        let win = self.scoreboard.make_move(row as usize, col as usize, &self.player);
+        let win = self
+            .scoreboard
+            .make_move(row as usize, col as usize, &self.player);
         if win {
             match self.player {
                 Player::P1 => self.gamestate = GameState::WinP1,
-                Player::P2 => self.gamestate = GameState::WinP2
+                Player::P2 => self.gamestate = GameState::WinP2,
             }
         } else if self.bitboard.is_full() {
             self.gamestate = GameState::Draw
@@ -122,7 +116,6 @@ impl Board {
             Player::P1 => self.player = Player::P2,
             Player::P2 => self.player = Player::P1,
         }
-
     }
     pub fn unmake_move(&mut self) {
         self.gamestate = GameState::Open;
@@ -130,12 +123,13 @@ impl Board {
             Player::P1 => self.player = Player::P2,
             Player::P2 => self.player = Player::P1,
         }
-        
+
         let col = self.movestack.pop_move();
         self.bitboard.unmake_move(col as u64, &self.player);
 
         let row = ROW - self.bitboard.get_space(col as u64);
-        self.scoreboard.unmake_move(row as usize, col as usize, &self.player);
+        self.scoreboard
+            .unmake_move(row as usize, col as usize, &self.player);
     }
 
     pub fn legal_moves(&self) -> Vec<u8> {
@@ -154,7 +148,7 @@ impl Board {
     }
 
     pub fn free_cells(&self) -> u8 {
-        7*6 - (self.movestack.moves.len() as u8)
+        7 * 6 - (self.movestack.moves.len() as u8)
     }
 
     pub fn is_empty(&self) -> bool {
@@ -162,12 +156,12 @@ impl Board {
     }
 
     pub fn new() -> Board {
-        Board { 
-            movestack: MoveStack::new(), 
+        Board {
+            movestack: MoveStack::new(),
             bitboard: BitBoard::new(),
-            scoreboard: ScoreBoard::new(), 
-            gamestate: GameState::Open, 
-            player: Player::P1 
+            scoreboard: ScoreBoard::new(),
+            gamestate: GameState::Open,
+            player: Player::P1,
         }
     }
 

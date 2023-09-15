@@ -57,7 +57,7 @@ impl ScoreBoard {
     pub fn total_score(&self) -> i32 {
         self.total_score
     }
-    
+
     pub fn make_move(&mut self, row: usize, col: usize, player: &Player) -> bool {
         let mut delta_score: i32 = 0;
         let mut win: bool = false;
@@ -67,11 +67,11 @@ impl ScoreBoard {
             let ps = sc.score;
             sc.add(player);
 
-            if sc.score.abs() == CONNECT as i32{
+            if sc.score.abs() == CONNECT as i32 {
                 win = true;
             }
 
-            delta_score  += sc.score - ps;
+            delta_score += sc.score - ps;
         }
         self.total_score += delta_score;
         win
@@ -85,7 +85,7 @@ impl ScoreBoard {
             let ps = sc.score;
             sc.sub(player);
 
-            delta_score  += sc.score - ps;
+            delta_score += sc.score - ps;
         }
         self.total_score += delta_score;
     }
@@ -152,33 +152,36 @@ impl ScoreBoard {
         let mut n: u32 = 0;
         for i in 0..ROW {
             for j in 0..COL {
-                
-                if ROW - i >= CONNECT { // orizontal --
-                    for k in i..(i+CONNECT) {
+                if ROW - i >= CONNECT {
+                    // orizontal --
+                    for k in i..(i + CONNECT) {
                         sbt[k as usize][j as usize].push_back(n);
                     }
                     n += 1;
                 }
-                
-                if COL - j >= CONNECT { // vertical |
-                    for k in j..(j+CONNECT) {
+
+                if COL - j >= CONNECT {
+                    // vertical |
+                    for k in j..(j + CONNECT) {
                         sbt[i as usize][k as usize].push_back(n);
                     }
                     n += 1;
                 }
-                
-                if (ROW - i >= CONNECT) && (COL - j >= CONNECT) { // diagonal \
+
+                if (ROW - i >= CONNECT) && (COL - j >= CONNECT) {
+                    // diagonal \
                     let mut kk = j;
-                    for k in i..(i+CONNECT) {
+                    for k in i..(i + CONNECT) {
                         sbt[k as usize][kk as usize].push_back(n);
                         kk += 1;
                     }
                     n += 1;
                 }
-                
-                if (ROW - i >= CONNECT) && (j + 1 >= CONNECT) { // diagonal /
+
+                if (ROW - i >= CONNECT) && (j + 1 >= CONNECT) {
+                    // diagonal /
                     let mut kk = j;
-                    for k in i..(i+CONNECT) {
+                    for k in i..(i + CONNECT) {
                         sbt[k as usize][kk as usize].push_back(n);
                         kk = kk.saturating_sub(1);
                     }
@@ -200,9 +203,8 @@ impl ScoreBoard {
 mod tests {
     use super::ScoreBoard;
 
-
     #[test]
-    fn lel () {
+    fn lel() {
         let mut ss: ScoreBoard = ScoreBoard::new();
         ss.make_move(0, 0, &crate::board::Player::P1);
         assert_eq!(ss.total_score, 3);
@@ -212,15 +214,15 @@ mod tests {
         ss.make_move(0, 0, &crate::board::Player::P2);
         assert_eq!(ss.total_score, -3);
         ss.make_move(0, 6, &crate::board::Player::P1);
-        assert_eq!(ss.total_score, 0)   
+        assert_eq!(ss.total_score, 0)
     }
 
     #[test]
-    fn tm () {
+    fn tm() {
         let mut ss: ScoreBoard = ScoreBoard::new();
         ss.make_move(0, 0, &crate::board::Player::P1);
         ss.unmake_move(0, 0, &crate::board::Player::P1);
-        assert_eq!(ss.total_score, 0)  
+        assert_eq!(ss.total_score, 0)
     }
 
     #[test]

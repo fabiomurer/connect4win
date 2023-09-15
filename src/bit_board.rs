@@ -12,14 +12,17 @@ pub struct BitBoard {
 
 impl Default for BitBoard {
     fn default() -> Self {
-        BitBoard { board: INIT_BITBOARD }
+        BitBoard {
+            board: INIT_BITBOARD,
+        }
     }
 }
 
 const SIZE_SPACE: u64 = 3;
 impl BitBoard {
     pub fn is_full(&self) -> bool {
-        (self.board & 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000) == 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000
+        (self.board & 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000)
+            == 0b0_111_111_111_111_111_111_111_000000000000000000000000000000000000000000
     }
     pub fn is_empty(&self) -> bool {
         self.board == INIT_BITBOARD

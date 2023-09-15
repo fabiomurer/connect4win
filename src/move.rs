@@ -19,7 +19,14 @@ impl Display for Move {
 }
 
 impl Move {
-    pub fn new(col: u8, player: Player, score: Score, depth: u8) -> Self { Self { col, player, score, depth } }
+    pub fn new(col: u8, player: Player, score: Score, depth: u8) -> Self {
+        Self {
+            col,
+            player,
+            score,
+            depth,
+        }
+    }
 
     pub fn col(&self) -> u8 {
         self.col
@@ -63,16 +70,14 @@ impl Ord for Move {
         } else {
             let compare_depth = self.depth.cmp(&other.depth);
             match self.score.state {
-                GameState::Open  => Ordering::Equal,
-                GameState::Draw  => compare_depth,
+                GameState::Open => Ordering::Equal,
+                GameState::Draw => compare_depth,
                 GameState::WinP1 => compare_depth.reverse(),
                 GameState::WinP2 => compare_depth,
             }
         }
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -90,8 +95,24 @@ mod tests {
         let m2 = Move::new(0, Player::P1, MAX, 2);
         assert_eq!(true, m1 < m2);
 
-        let m1 = Move::new(4, Player::P2, Score { score: -4, state: GameState::WinP1 }, 2);
-        let m2 = Move::new(6, Player::P2, Score { score: -3, state: GameState::WinP1 }, 18);
+        let m1 = Move::new(
+            4,
+            Player::P2,
+            Score {
+                score: -4,
+                state: GameState::WinP1,
+            },
+            2,
+        );
+        let m2 = Move::new(
+            6,
+            Player::P2,
+            Score {
+                score: -3,
+                state: GameState::WinP1,
+            },
+            18,
+        );
         assert_eq!(true, m1.cmp(&m2) == Ordering::Greater);
     }
 }
