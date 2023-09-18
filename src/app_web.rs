@@ -1,3 +1,5 @@
+#![cfg(target_family = "wasm")]
+
 use yew::prelude::*;
 
 use crate::board::*;

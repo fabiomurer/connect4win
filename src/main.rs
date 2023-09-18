@@ -1,5 +1,4 @@
 mod app_console;
-mod app_web;
 mod bit_board;
 mod board;
 mod r#move;
@@ -8,17 +7,20 @@ mod score;
 mod score_board;
 mod timer;
 mod transposition_table;
+mod app_web;
 
-#[cfg(target_arch = "wasm")]
+#[cfg(target_family = "wasm")]
 extern crate console_error_panic_hook;
 #[cfg(target_family = "wasm")]
 use std::panic;
 
+#[cfg(target_family = "wasm")]
 fn main() {
-    if cfg!(target_family = "wasm") {
-        panic::set_hook(Box::new(console_error_panic_hook::hook));
-        app_web::app();
-    } else {
-        app_console::app();
-    }
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
+    app_web::app();
+}
+
+#[cfg(not(target_family = "wasm"))]
+fn main() {
+    app_console::app();
 }
