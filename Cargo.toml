@@ -8,10 +8,7 @@ edition = "2021"
 [profile.release]
 debug = true
 
-[dependencies]
+[target.'cfg(target_family = "wasm")'.dependencies]
 yew = { version = "0.20", features = ["csr"] }
 console_error_panic_hook = "0.1.7"
 instant = { version = "0.1.12", features = [ "wasm-bindgen" ] }
-
-#[target.'cfg(target_family = "wasm")'.dependencies]
-#yew = { version = "0.20", features = ["csr"] }

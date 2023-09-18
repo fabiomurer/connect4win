@@ -9,9 +9,9 @@ mod score_board;
 mod timer;
 mod transposition_table;
 
-//#[cfg(target_family = "wasm")]
+#[cfg(target_arch = "wasm")]
 extern crate console_error_panic_hook;
-//#[cfg(target_family = "wasm")]
+#[cfg(target_family = "wasm")]
 use std::panic;
 
 fn main() {

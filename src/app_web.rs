@@ -116,6 +116,7 @@ impl Component for App {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let spaces = self.board.bitboard().get_space_array();
         html! {
             <div>
                 <button onclick={ctx.link().callback(|_| Msg::NewGame)}>{ "new game" }</button>
@@ -123,15 +124,21 @@ impl Component for App {
                 <p>{ self.m }</p>
                 {
                     html! {
-                        <table style="width:500px">
-                            <tr>
-                                {
-                                    (0..7).map(|num| {
-                                        html! { <td><button onclick={ctx.link().callback(move |_| Msg::Move(num.clone()))}> { "move" }</button></td>}
-                                    }).collect::<Html>()
-                                }
-                            </tr>
-                        </table>
+                        if self.board.gamestate() == GameState::Open {
+                            <table style="width:500px">
+                                <tr>
+                                    {
+                                        (0..(7 as u8)).map(|i| {
+                                            if spaces[i as usize] > 0 {
+                                                html! { <td><button onclick={ctx.link().callback(move |_| Msg::Move(i))}> { "move" }</button></td>}
+                                            } else {
+                                                html! { <td><button onclick={ctx.link().callback(move |_| Msg::Move(i))} disabled={true}> { "move" }</button></td>}
+                                            }
+                                        }).collect::<Html>()
+                                    }
+                                </tr>
+                            </table>
+                        }
                     }
                 }
                 <GameBoard board={self.board.clone()}/>

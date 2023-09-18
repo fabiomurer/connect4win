@@ -17,6 +17,14 @@ impl Engine {
         }
     }
 
+    pub fn set_time(&mut self, seconds: u64) {
+        self.timer = Timer::new(seconds);
+    }
+
+    pub fn set_table(&mut self, table_size: usize) {
+        self.table = Table::new(table_size);
+    }
+
     fn move_sort(board: &mut Board) -> Vec<u8> {
         let v = board.legal_moves();
         let mut mv: Vec<Move> = Vec::with_capacity(COL as usize);
