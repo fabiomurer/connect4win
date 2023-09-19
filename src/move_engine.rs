@@ -10,15 +10,15 @@ pub struct Engine {
 }
 
 impl Engine {
-    pub fn new(seconds: u64, table_size: usize) -> Engine {
+    pub fn new(cycles: u64, table_size: usize) -> Engine {
         Engine {
-            timer: Timer::new(seconds),
+            timer: Timer::new(cycles),
             table: Table::new(table_size),
         }
     }
 
-    pub fn set_time(&mut self, seconds: u64) {
-        self.timer = Timer::new(seconds);
+    pub fn set_time(&mut self, cycles: u64) {
+        self.timer = Timer::new(cycles);
     }
 
     pub fn set_table(&mut self, table_size: usize) {
@@ -225,7 +225,7 @@ mod tests {
 
         let mut board = Board::new();
         board.make_move(3);
-        let mut e = Engine::new(3, 100_000);
+        let mut e = Engine::new(100_000_000, 100_000);
 
         let start = Instant::now();
         _ = e.alpha_beta(&mut board, MIN, MAX, 12);

@@ -4,7 +4,7 @@ use std::io;
 
 pub fn app() {
     let mut board = board::Board::new();
-    let mut e = move_engine::Engine::new(3, 100_000);
+    let mut e = move_engine::Engine::new(3_000_000, 100_000);
 
     println!("p1 for first player, p2 for second");
     let mut buf = String::new();
