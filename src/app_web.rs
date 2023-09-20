@@ -1,11 +1,10 @@
 #![cfg(target_family = "wasm")]
+#![allow(non_snake_case)]
 
-use yew::prelude::*;
+use dioxus::prelude::*;
 
 use crate::board::*;
 use crate::move_engine::*;
-use crate::r#move::*;
-use crate::score::*;
 
 #[derive(Debug, Clone, Copy)]
 enum CellType {
@@ -38,117 +37,91 @@ fn board_to_arr(board: &Board) -> [[CellType; COL as usize]; ROW as usize] {
     arr
 }
 
-#[derive(Properties, PartialEq)]
-struct BoardProps {
-    board: Board,
-}
 
-#[function_component]
-fn GameBoard(props: &BoardProps) -> Html {
-    let arr = board_to_arr(&props.board);
-
-    html! {
-        <>
-        <table style="width:500px">
-            {
-                arr.into_iter().map(|r| {
-                    html! {
-                        <tr style="height:50px">
-                            {
-                                r.into_iter().map(|c| {
-                                    match c {
-                                        CellType::Empty => html!{<td style="background-color: blue">{""}</td>},
-                                        CellType::P1 => html!{<td style="background-color: red">{""}</td>},
-                                        CellType::P2 => html!{<td style="background-color: yellow">{""}</td>}
-                                    }
-                                }).collect::<Html>()
+fn Board(cx: Scope) -> Element {
+    
+    let board = use_shared_state::<Board>(cx).unwrap();
+    let arr = board_to_arr(&board.read());
+    let spaces = board.read().bitboard().get_space_array();
+    let state = board.read().gamestate();
+    cx.render(rsx! {
+        p {"game state: {state:?}"},
+        div {
+            table {
+                "style": "width: 500px",
+                tr {
+                    (0..(7 as u8)).map(|i| {
+                        rsx! {
+                            td { 
+                                button {
+                                    disabled: (spaces[i as usize] <= 0) || (board.read().gamestate() != GameState::Open),
+                                    onclick: move |_| {
+                                        board.write().make_move(i)
+                                    },
+                                    "move",
+                                }
                             }
-                        </tr>
-                    }
-
-                }).collect::<Html>()
-            }
-        </table>
-        <p>{format!("game state: {:?}", props.board.gamestate())}</p>
-        </>
-    }
-}
-
-enum Msg {
-    NewGame,
-    Bestmove,
-    Move(u8),
-}
-
-struct App {
-    engine: Engine,
-    board: Board,
-    m: Move,
-}
-
-impl Component for App {
-    type Message = Msg;
-    type Properties = ();
-
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            engine: Engine::new(3, 100_000),
-            board: Board::new(),
-            m: Move::new(0, Player::P1, EQUAL, 0),
-        }
-    }
-
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            Msg::NewGame => {
-                self.board = Board::new();
-                self.m = Move::new(0, Player::P1, EQUAL, 0);
-                true
-            }
-            Msg::Bestmove => {
-                self.m = self.engine.iterative_depening(&self.board);
-                self.board.make_move(self.m.col());
-                true
-            }
-            Msg::Move(col) => {
-                self.board.make_move(col);
-                true
-            }
-        }
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let spaces = self.board.bitboard().get_space_array();
-        html! {
-            <div>
-                <button onclick={ctx.link().callback(|_| Msg::NewGame)}>{ "new game" }</button>
-                <button onclick={ctx.link().callback(|_| Msg::Bestmove)}>{ "play best move" }</button>
-                <p>{ self.m }</p>
-                {
-                    html! {
-                        if self.board.gamestate() == GameState::Open {
-                            <table style="width:500px">
-                                <tr>
-                                    {
-                                        (0..(7 as u8)).map(|i| {
-                                            if spaces[i as usize] > 0 {
-                                                html! { <td><button onclick={ctx.link().callback(move |_| Msg::Move(i))}> { "move" }</button></td>}
-                                            } else {
-                                                html! { <td><button onclick={ctx.link().callback(move |_| Msg::Move(i))} disabled={true}> { "move" }</button></td>}
-                                            }
-                                        }).collect::<Html>()
-                                    }
-                                </tr>
-                            </table>
-                        }
-                    }
+                        } 
+                    })
                 }
-                <GameBoard board={self.board.clone()}/>
-            </div>
+            }
+        },
+        div {
+            table {
+                "style": "width: 500px",
+                arr.into_iter().map(|r| rsx! {
+                    tr {
+                        "style": "height:50px",
+                        r.into_iter().map(|c| rsx! {
+                            match c {
+                                CellType::Empty => rsx! { td { "style": "background-color: blue"}},
+                                CellType::P1 => rsx! { td { "style": "background-color: yellow"}},
+                                CellType::P2 => rsx! { td { "style": "background-color: red"}},
+                            }
+                        })
+                    }
+                })
+            }
         }
-    }
+        div {
+            button {
+                onclick: move |_| {
+                    *board.write() = Board::new();
+                },
+                "reset",
+            }
+        },
+    })
+}
+
+fn Intro(cx: Scope) -> Element {
+    cx.render(rsx! {
+        h1 { "Connect4Win" },
+        p { "A connect-four game engine" }
+    })
+}
+
+fn App(cx: Scope) -> Element {
+    use_shared_state_provider(cx, || Board::new());
+    let board = use_shared_state::<Board>(cx).unwrap();
+
+    let mut e = Engine::new(3, 100_000);
+
+    cx.render(rsx! {
+        div {
+            Intro {},
+            button {
+                onclick: move |_| {
+                    let m = e.iterative_depening(&board.read());
+                    board.write().make_move(m.col())
+                },
+                "cpu move",
+            },
+            Board {}
+        }
+    })
 }
 
 pub fn app() {
-    yew::Renderer::<App>::new().render();
+    dioxus_web::launch(App);
 }

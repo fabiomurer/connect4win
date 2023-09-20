@@ -9,6 +9,7 @@ edition = "2021"
 debug = true
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-yew = { version = "0.20", features = ["csr"] }
+dioxus = "0.4.0"
+dioxus-web = "0.4.0"
 console_error_panic_hook = "0.1.7"
 instant = { version = "0.1.12", features = [ "wasm-bindgen" ] }
