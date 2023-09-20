@@ -1,4 +1,5 @@
 /target
 /dist
+Cargo.lock
 perf.data.old
 perf.data
