@@ -18,11 +18,11 @@ impl Engine {
     }
 
     pub fn set_time(&mut self, seconds: u64) {
-        self.timer = Timer::new(seconds);
+        self.timer.set_duration(seconds);
     }
 
     pub fn set_table(&mut self, table_size: usize) {
-        self.table = Table::new(table_size);
+        self.table.set_size(table_size);
     }
 
     fn move_sort(board: &mut Board) -> Vec<u8> {
@@ -177,8 +177,14 @@ impl Engine {
         out
     }
 
-    pub fn iterative_depening(&mut self, board: &Board) -> Move {
+    fn get_ready(&mut self) {
+        self.table.get_ready();
         self.timer.start();
+    }
+
+    pub fn iterative_depening(&mut self, board: &Board) -> Move {
+        self.get_ready();
+
         let mut tb: Board = board.clone();
         let mut movelist = Self::init_move_array(&tb);
         let mut bestmove: Move = movelist[0];

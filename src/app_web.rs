@@ -1,6 +1,11 @@
 #![cfg(target_family = "wasm")]
 #![allow(non_snake_case)]
 
+use dioxus::html::br;
+use dioxus::html::div;
+use dioxus::html::input;
+use dioxus::html::label;
+use dioxus::html::p;
 use dioxus::prelude::*;
 
 use crate::board::*;
@@ -101,22 +106,136 @@ fn Intro(cx: Scope) -> Element {
     })
 }
 
+#[derive(Copy, Clone, PartialEq, Eq)]
+enum PlaterType {
+    Human,
+    Cpu,
+}
+
+impl PlaterType {
+    fn rev(self) -> PlaterType {
+        match self {
+            PlaterType::Cpu => PlaterType::Human,
+            PlaterType::Human => PlaterType::Cpu,
+        }
+    }
+}
+
+const DEFAULT_SECS: u64 = 3;
+const DEFAULT_TABLE_SIZE: usize = 100_000;
+
 fn App(cx: Scope) -> Element {
     use_shared_state_provider(cx, || Board::new());
     let board = use_shared_state::<Board>(cx).unwrap();
 
-    let mut e = Engine::new(3, 100_000);
+    let mut e1 = Engine::new(DEFAULT_SECS, DEFAULT_TABLE_SIZE);
+    let mut e2 = Engine::new(DEFAULT_SECS, DEFAULT_TABLE_SIZE);
+
+    let mut p1 = use_state(cx, || PlaterType::Human);
+    let mut p2 = use_state(cx, || PlaterType::Human);
 
     cx.render(rsx! {
         div {
             Intro {},
-            button {
+
+            
+            /*button {
                 onclick: move |_| {
                     let m = e.iterative_depening(&board.read());
                     board.write().make_move(m.col())
                 },
                 "cpu move",
-            },
+            },*/
+            div {
+                input {
+                    id: "p1",
+                    r#type: "checkbox",
+                    oninput: |_| p1.set(p1.rev()),
+                }
+                label {
+                    "for": "p1",
+                    "Cpu player 1"
+                }
+
+                if *p1.get() == PlaterType::Cpu {
+                    rsx! {
+                        div {
+                            input {
+                                r#type: "number",
+                                id: "p1t",
+                                "min": 1,
+                                value: 3,
+                                oninput: move |evt| {
+                                    e1.set_time(evt.value.parse().unwrap());
+                                }
+                            }
+                            label {
+                                "for": "p1t",
+                                "Time (s)"
+                            }
+                            br {}
+                            input {
+                                r#type: "number",
+                                id: "p1m",
+                                "min": 1_000,
+                                "max": 1_000_000,
+                                "step": 50_000,
+                                value: 100_000,
+                                oninput: move |evt| {
+                                    e1.set_table(evt.value.parse().unwrap());
+                                }
+                            }
+                            label {
+                                "for": "p1m",
+                                "Table size (entrys)"
+                            }
+                        }
+                    }
+                }
+            }
+
+            div {
+                input {
+                    id: "p2",
+                    r#type: "checkbox",
+                    oninput: |_| p2.set(p2.rev()),
+                }
+                label {
+                    "for": "p2",
+                    "Cpu player 2"
+                }
+
+                if *p2.get() == PlaterType::Cpu {
+                    rsx! {
+                        div {
+                            input {
+                                r#type: "number",
+                                id: "p2t",
+                                "min": 1,
+                                value: 3,
+                            }
+                            label {
+                                "for": "p2t",
+                                "Time (s)"
+                            }
+                            br {}
+                            input {
+                                r#type: "number",
+                                id: "p2m",
+                                "min": 1_000,
+                                "max": 1_000_000,
+                                "step": 50_000,
+                                value: 100_000,
+                            }
+                            label {
+                                "for": "p2m",
+                                "Table size (entrys)"
+                            }
+                        }
+                    }
+                }
+            }
+
             Board {}
         }
     })

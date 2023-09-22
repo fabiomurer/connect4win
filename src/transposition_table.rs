@@ -19,12 +19,20 @@ impl Table {
     pub fn new(size: usize) -> Table {
         Table {
             size,
-            table: vec![Default::default(); size].into_boxed_slice(),
+            table: vec![Default::default(); 1].into_boxed_slice(),
         }
     }
 
-    pub fn clean(&mut self) {
+    pub fn alloc(&mut self) {
         self.table = vec![Default::default(); self.size].into_boxed_slice();
+    }
+
+    pub fn clean(&mut self) {
+        self.alloc();
+    }
+
+    pub fn get_ready(&mut self) {
+        self.alloc();
     }
 
     fn get_index(&self, key: &BitBoard) -> usize {
@@ -47,6 +55,10 @@ impl Table {
         let index = self.get_index(&key);
         let entry: Entry = Entry { score, key };
         self.table[index] = entry;
+    }
+
+    pub fn set_size(&mut self, size: usize) {
+        self.size = size;
     }
 }
 

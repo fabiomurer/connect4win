@@ -40,6 +40,10 @@ impl Timer {
             Ok(elapsed)
         }
     }
+
+    pub fn set_duration(&mut self, seconds: u64) {
+        self.duration = Duration::new(seconds, 0);
+    }
 }
 
 #[cfg(test)]
