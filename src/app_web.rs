@@ -1,10 +1,13 @@
 #![cfg(target_family = "wasm")]
 #![allow(non_snake_case)]
 
+use dioxus::html::p;
 use dioxus::prelude::*;
 
 use crate::board::*;
 use crate::move_engine::*;
+use crate::r#move::Move;
+use crate::score::*;
 
 #[derive(Debug, Clone, Copy)]
 enum CellType {
@@ -102,16 +105,16 @@ fn Intro(cx: Scope) -> Element {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq)]
-enum PlaterType {
+enum PlayerType {
     Human,
     Cpu,
 }
 
-impl PlaterType {
-    fn rev(self) -> PlaterType {
+impl PlayerType {
+    fn rev(self) -> PlayerType {
         match self {
-            PlaterType::Cpu => PlaterType::Human,
-            PlaterType::Human => PlaterType::Cpu,
+            PlayerType::Cpu => PlayerType::Human,
+            PlayerType::Human => PlayerType::Cpu,
         }
     }
 }
@@ -125,13 +128,28 @@ fn App(cx: Scope) -> Element {
 
     let e1 = use_ref(cx, || Engine::new(DEFAULT_SECS, DEFAULT_TABLE_SIZE));
     let e2 = use_ref(cx, || Engine::new(DEFAULT_SECS, DEFAULT_TABLE_SIZE));
-    let p1 = use_state(cx, || PlaterType::Human);
-    let p2 = use_state(cx, || PlaterType::Human);
+    let p1 = use_state(cx, || PlayerType::Human);
+    let p2 = use_state(cx, || PlayerType::Human);
 
     let p1t = use_state(cx, || DEFAULT_SECS);
     let p1m = use_state(cx, || DEFAULT_TABLE_SIZE);
     let p2t = use_state(cx, || DEFAULT_SECS);
     let p2m = use_state(cx, || DEFAULT_TABLE_SIZE);
+
+    let m1 = use_state(cx, || Move::new(0, Player::P1, EQUAL, 0));
+    let m2 = use_state(cx, || Move::new(0, Player::P1, EQUAL, 0));
+
+    if board.read().player() == Player::P2 && p2.get().clone() == PlayerType::Cpu {
+        let m = e2.with_mut(|e| e.iterative_depening(&board.read()));
+        board.write().make_move(m.col());
+        m2.set(m);
+    }
+
+    if board.read().player() == Player::P1 && p1.get().clone() == PlayerType::Cpu {
+        let m = e1.with_mut(|e| e.iterative_depening(&board.read()));
+        board.write().make_move(m.col());
+        m1.set(m);
+    }
 
     cx.render(rsx! {
         div {
@@ -156,9 +174,10 @@ fn App(cx: Scope) -> Element {
                     "Cpu player 1"
                 }
 
-                if *p1.get() == PlaterType::Cpu {
+                if *p1.get() == PlayerType::Cpu {
                     rsx! {
                         div {
+                            p {"{m1}"},
                             input {
                                 r#type: "number",
                                 id: "p1t",
@@ -208,8 +227,9 @@ fn App(cx: Scope) -> Element {
                     "Cpu player 2"
                 }
 
-                if *p2.get() == PlaterType::Cpu {
+                if *p2.get() == PlayerType::Cpu {
                     rsx! {
+                        p {"{m2}"},
                         div {
                             input {
                                 r#type: "number",
