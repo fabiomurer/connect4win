@@ -1,11 +1,6 @@
 #![cfg(target_family = "wasm")]
 #![allow(non_snake_case)]
 
-use dioxus::html::br;
-use dioxus::html::div;
-use dioxus::html::input;
-use dioxus::html::label;
-use dioxus::html::p;
 use dioxus::prelude::*;
 
 use crate::board::*;
@@ -128,11 +123,15 @@ fn App(cx: Scope) -> Element {
     use_shared_state_provider(cx, || Board::new());
     let board = use_shared_state::<Board>(cx).unwrap();
 
-    let mut e1 = Engine::new(DEFAULT_SECS, DEFAULT_TABLE_SIZE);
-    let mut e2 = Engine::new(DEFAULT_SECS, DEFAULT_TABLE_SIZE);
+    let e1 = use_ref(cx, || Engine::new(DEFAULT_SECS, DEFAULT_TABLE_SIZE));
+    let e2 = use_ref(cx, || Engine::new(DEFAULT_SECS, DEFAULT_TABLE_SIZE));
+    let p1 = use_state(cx, || PlaterType::Human);
+    let p2 = use_state(cx, || PlaterType::Human);
 
-    let mut p1 = use_state(cx, || PlaterType::Human);
-    let mut p2 = use_state(cx, || PlaterType::Human);
+    let p1t = use_state(cx, || DEFAULT_SECS);
+    let p1m = use_state(cx, || DEFAULT_TABLE_SIZE);
+    let p2t = use_state(cx, || DEFAULT_SECS);
+    let p2m = use_state(cx, || DEFAULT_TABLE_SIZE);
 
     cx.render(rsx! {
         div {
@@ -164,9 +163,11 @@ fn App(cx: Scope) -> Element {
                                 r#type: "number",
                                 id: "p1t",
                                 "min": 1,
-                                value: 3,
+                                value: "{p1t}",
                                 oninput: move |evt| {
-                                    e1.set_time(evt.value.parse().unwrap());
+                                    let n: u64 = evt.value.parse().unwrap();
+                                    p1t.set(n);
+                                    e1.with_mut(|e1| e1.set_time(n))
                                 }
                             }
                             label {
@@ -180,9 +181,11 @@ fn App(cx: Scope) -> Element {
                                 "min": 1_000,
                                 "max": 1_000_000,
                                 "step": 50_000,
-                                value: 100_000,
+                                value: "{p1m}",
                                 oninput: move |evt| {
-                                    e1.set_table(evt.value.parse().unwrap());
+                                    let n: usize = evt.value.parse().unwrap();
+                                    p1m.set(n);
+                                    e1.with_mut(|e1| e1.set_table(n))
                                 }
                             }
                             label {
@@ -212,7 +215,12 @@ fn App(cx: Scope) -> Element {
                                 r#type: "number",
                                 id: "p2t",
                                 "min": 1,
-                                value: 3,
+                                value: "{p2t}",
+                                oninput: move |evt| {
+                                    let n: u64 = evt.value.parse().unwrap();
+                                    p2t.set(n);
+                                    e2.with_mut(|e2| e2.set_time(n))
+                                }
                             }
                             label {
                                 "for": "p2t",
@@ -225,7 +233,12 @@ fn App(cx: Scope) -> Element {
                                 "min": 1_000,
                                 "max": 1_000_000,
                                 "step": 50_000,
-                                value: 100_000,
+                                value: "{p2m}",
+                                oninput: move |evt| {
+                                    let n: usize = evt.value.parse().unwrap();
+                                    p2m.set(n);
+                                    e2.with_mut(|e2| e2.set_table(n))
+                                }
                             }
                             label {
                                 "for": "p2m",
