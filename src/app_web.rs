@@ -1,7 +1,6 @@
 #![cfg(target_family = "wasm")]
 #![allow(non_snake_case)]
 
-use dioxus::html::p;
 use dioxus::prelude::*;
 
 use crate::board::*;
@@ -40,9 +39,7 @@ fn board_to_arr(board: &Board) -> [[CellType; COL as usize]; ROW as usize] {
     arr
 }
 
-
 fn Board(cx: Scope) -> Element {
-    
     let board = use_shared_state::<Board>(cx).unwrap();
     let arr = board_to_arr(&board.read());
     let spaces = board.read().bitboard().get_space_array();
@@ -155,7 +152,7 @@ fn App(cx: Scope) -> Element {
         div {
             Intro {},
 
-            
+
             /*button {
                 onclick: move |_| {
                     let m = e.iterative_depening(&board.read());

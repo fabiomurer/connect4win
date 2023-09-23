@@ -1,4 +1,5 @@
 mod app_console;
+mod app_web;
 mod bit_board;
 mod board;
 mod r#move;
@@ -7,7 +8,6 @@ mod score;
 mod score_board;
 mod timer;
 mod transposition_table;
-mod app_web;
 
 #[cfg(target_family = "wasm")]
 extern crate console_error_panic_hook;
