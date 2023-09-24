@@ -47,8 +47,9 @@ fn Board(cx: Scope) -> Element {
     cx.render(rsx! {
         p {"game state: {state:?}"},
         div {
+            "style": "max-width: 700px;",
             table {
-                "style": "width: 500px",
+                "style": "table-layout: fixed; width: 100%; height: 100%;",
                 tr {
                     (0..(7 as u8)).map(|i| {
                         rsx! {
@@ -67,16 +68,16 @@ fn Board(cx: Scope) -> Element {
             }
         },
         div {
+            "style": "max-width: 700px; aspect-ratio : 7 / 6; background-color: black",
             table {
-                "style": "width: 500px",
+                "style": "table-layout: fixed; width: 100%; height: 100%;",
                 arr.into_iter().map(|r| rsx! {
                     tr {
-                        "style": "height:50px",
                         r.into_iter().map(|c| rsx! {
                             match c {
-                                CellType::Empty => rsx! { td { "style": "background-color: blue"}},
-                                CellType::P1 => rsx! { td { "style": "background-color: yellow"}},
-                                CellType::P2 => rsx! { td { "style": "background-color: red"}},
+                                CellType::Empty => rsx! { td { "style": "border-radius: 50%; background-color: blue"}},
+                                CellType::P1 => rsx! { td { "style": "border-radius: 50%; background-color: yellow"}},
+                                CellType::P2 => rsx! { td { "style": "border-radius: 50%; background-color: red"}},
                             }
                         })
                     }
@@ -89,6 +90,14 @@ fn Board(cx: Scope) -> Element {
                     *board.write() = Board::new();
                 },
                 "reset",
+            }
+        },
+        div {
+            button {
+                onclick: move |_| {
+                    board.write().unmake_move();
+                },
+                "undo",
             }
         },
     })
