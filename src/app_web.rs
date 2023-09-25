@@ -1,8 +1,6 @@
 #![cfg(target_family = "wasm")]
 #![allow(non_snake_case)]
 
-use dioxus::html::footer;
-use dioxus::html::header;
 use dioxus::prelude::*;
 
 use crate::board::*;
@@ -48,7 +46,7 @@ fn Board(cx: Scope) -> Element {
     let state = board.read().gamestate();
     cx.render(rsx! {
         div {
-            "style": "max-width: 60em; margin: auto;",
+            "style": "max-width: 50em; margin: auto;",
             p {"game state: {state:?}"},
             div {
                 table {
@@ -117,7 +115,9 @@ fn Layout<'a>(cx: Scope<'a, LayoutProps<'a>>) -> Element {
         body {
             class: "HolyGrail",
             header {
-                Intro {}
+                "style": "margin: auto;",
+                h1 { "Connect4Win" },
+                p { "A connect-four game engine" }
             },
             div {
                 class: "HolyGrail-body",
@@ -134,13 +134,6 @@ fn Layout<'a>(cx: Scope<'a, LayoutProps<'a>>) -> Element {
             },
             footer {}
         }
-    })
-}
-
-fn Intro(cx: Scope) -> Element {
-    cx.render(rsx! {
-        h1 { "Connect4Win" },
-        p { "A connect-four game engine" }
     })
 }
 
@@ -178,18 +171,6 @@ fn App(cx: Scope) -> Element {
 
     let m1 = use_state(cx, || Move::new(0, Player::P1, EQUAL, 0));
     let m2 = use_state(cx, || Move::new(0, Player::P1, EQUAL, 0));
-
-    if board.read().player() == Player::P2 && p2.get().clone() == PlayerType::Cpu {
-        let m = e2.with_mut(|e| e.iterative_depening(&board.read()));
-        board.write().make_move(m.col());
-        m2.set(m);
-    }
-
-    if board.read().player() == Player::P1 && p1.get().clone() == PlayerType::Cpu {
-        let m = e1.with_mut(|e| e.iterative_depening(&board.read()));
-        board.write().make_move(m.col());
-        m1.set(m);
-    }
 
     cx.render(rsx! {
         Layout {
@@ -240,6 +221,20 @@ fn App(cx: Scope) -> Element {
                             label {
                                 "for": "p1m",
                                 "Table size (entrys)"
+                            }
+                            br {}
+                            if board.read().player() == Player::P1 {
+                                rsx! {
+                                    button {
+                                        "style": "color: red;",
+                                        onclick: move |_| {
+                                            let m = e1.with_mut(|e| e.iterative_depening(&board.read()));
+                                            board.write().make_move(m.col());
+                                            m1.set(m);
+                                        },
+                                        "compute move"
+                                    }
+                                }
                             }
                         }
                     }
@@ -293,6 +288,20 @@ fn App(cx: Scope) -> Element {
                             label {
                                 "for": "p2m",
                                 "Table size (entrys)"
+                            }
+                            br {}
+                            if board.read().player() == Player::P2 {
+                                rsx! {
+                                    button {
+                                        "style": "color: red;",
+                                        onclick: move |_| {
+                                            let m = e2.with_mut(|e| e.iterative_depening(&board.read()));
+                                            board.write().make_move(m.col());
+                                            m2.set(m);
+                                        },
+                                        "compute move"
+                                    }
+                                }
                             }
                         }
                     }
