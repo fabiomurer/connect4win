@@ -1,6 +1,8 @@
 #![cfg(target_family = "wasm")]
 #![allow(non_snake_case)]
 
+use dioxus::html::footer;
+use dioxus::html::header;
 use dioxus::prelude::*;
 
 use crate::board::*;
@@ -45,61 +47,93 @@ fn Board(cx: Scope) -> Element {
     let spaces = board.read().bitboard().get_space_array();
     let state = board.read().gamestate();
     cx.render(rsx! {
-        p {"game state: {state:?}"},
         div {
-            "style": "max-width: 700px;",
-            table {
-                "style": "table-layout: fixed; width: 100%; height: 100%;",
-                tr {
-                    (0..(7 as u8)).map(|i| {
-                        rsx! {
-                            td { 
-                                button {
-                                    disabled: (spaces[i as usize] <= 0) || (board.read().gamestate() != GameState::Open),
-                                    onclick: move |_| {
-                                        board.write().make_move(i)
-                                    },
-                                    "move",
+            "style": "max-width: 60em; margin: auto;",
+            p {"game state: {state:?}"},
+            div {
+                table {
+                    "style": "table-layout: fixed; width: 100%; height: 100%; text-align: center;",
+                    tr {
+                        (0..(7 as u8)).map(|i| {
+                            rsx! {
+                                td { 
+                                    button {
+                                        disabled: (spaces[i as usize] <= 0) || (board.read().gamestate() != GameState::Open),
+                                        onclick: move |_| {
+                                            board.write().make_move(i)
+                                        },
+                                        "move",
+                                    }
                                 }
-                            }
-                        } 
+                            } 
+                        })
+                    }
+                }
+            },
+            div {
+                "style": "aspect-ratio : 7 / 6; background-color: black;",
+                table {
+                    "style": "table-layout: fixed; width: 100%; height: 100%; border-spacing: 0.5em;",
+                    arr.into_iter().map(|r| rsx! {
+                        tr {
+                            r.into_iter().map(|c| rsx! {
+                                match c {
+                                    CellType::Empty => rsx! { td { "style": "border-radius: 50%; background-color: blue"}},
+                                    CellType::P1 => rsx! { td { "style": "border-radius: 50%; background-color: yellow"}},
+                                    CellType::P2 => rsx! { td { "style": "border-radius: 50%; background-color: red"}},
+                                }
+                            })
+                        }
                     })
                 }
             }
-        },
-        div {
-            "style": "max-width: 700px; aspect-ratio : 7 / 6; background-color: black",
-            table {
-                "style": "table-layout: fixed; width: 100%; height: 100%;",
-                arr.into_iter().map(|r| rsx! {
-                    tr {
-                        r.into_iter().map(|c| rsx! {
-                            match c {
-                                CellType::Empty => rsx! { td { "style": "border-radius: 50%; background-color: blue"}},
-                                CellType::P1 => rsx! { td { "style": "border-radius: 50%; background-color: yellow"}},
-                                CellType::P2 => rsx! { td { "style": "border-radius: 50%; background-color: red"}},
-                            }
-                        })
-                    }
-                })
-            }
+            div {
+                button {
+                    onclick: move |_| {
+                        *board.write() = Board::new();
+                    },
+                    "reset",
+                }
+            },
+            div {
+                button {
+                    onclick: move |_| {
+                        board.write().unmake_move();
+                    },
+                    "undo",
+                }
+            },
         }
-        div {
-            button {
-                onclick: move |_| {
-                    *board.write() = Board::new();
+    })
+}
+
+#[derive(Props)]
+struct LayoutProps<'a> {
+    children: Element<'a>,
+}
+
+fn Layout<'a>(cx: Scope<'a, LayoutProps<'a>>) -> Element {
+    cx.render(rsx! {
+        body {
+            class: "HolyGrail",
+            header {
+                Intro {}
+            },
+            div {
+                class: "HolyGrail-body",
+                r#main {
+                    class: "HolyGrail-content",
+                    &cx.props.children
                 },
-                "reset",
-            }
-        },
-        div {
-            button {
-                onclick: move |_| {
-                    board.write().unmake_move();
+                nav {
+                    class: "HolyGrail-nav"
                 },
-                "undo",
-            }
-        },
+                aside {
+                    class: "HolyGrail-ads"
+                }
+            },
+            footer {}
+        }
     })
 }
 
@@ -158,17 +192,7 @@ fn App(cx: Scope) -> Element {
     }
 
     cx.render(rsx! {
-        div {
-            Intro {},
-
-
-            /*button {
-                onclick: move |_| {
-                    let m = e.iterative_depening(&board.read());
-                    board.write().make_move(m.col())
-                },
-                "cpu move",
-            },*/
+        Layout {
             div {
                 input {
                     id: "p1",
