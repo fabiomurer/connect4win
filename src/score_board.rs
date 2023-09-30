@@ -1,5 +1,8 @@
 use crate::board::*;
-use std::collections::LinkedList;
+use crate::get_array;
+use crate::push;
+use crate::showtype;
+use crate::vec_macro;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ScoreSet {
@@ -35,7 +38,7 @@ impl ScoreSet {
         self.fix_score();
     }
 
-    pub fn init() -> ScoreSet {
+    pub const fn init() -> ScoreSet {
         ScoreSet {
             score: 0,
             p1: 0,
@@ -49,7 +52,7 @@ const NSC: usize = 207; // chissà se è giosto
 #[derive(Clone, PartialEq)]
 pub struct ScoreBoard {
     total_score: i32,
-    scoreboard: [[LinkedList<u32>; COL as usize]; ROW as usize],
+    scoreboard: [[showtype!(u32, 16); COL as usize]; ROW as usize],
     scoresets: [ScoreSet; NSC],
 }
 
@@ -62,7 +65,7 @@ impl ScoreBoard {
         let mut delta_score: i32 = 0;
         let mut win: bool = false;
 
-        for i in self.scoreboard[row][col].iter() {
+        for i in get_array!(self.scoreboard[row][col]) {
             let sc = &mut self.scoresets[*i as usize];
             let ps = sc.score;
             sc.add(player);
@@ -80,7 +83,7 @@ impl ScoreBoard {
     pub fn unmake_move(&mut self, row: usize, col: usize, player: &Player) {
         let mut delta_score: i32 = 0;
 
-        for i in self.scoreboard[row][col].iter() {
+        for i in get_array!(self.scoreboard[row][col]) {
             let sc = &mut self.scoresets[*i as usize];
             let ps = sc.score;
             sc.sub(player);
@@ -90,89 +93,97 @@ impl ScoreBoard {
         self.total_score += delta_score;
     }
 
-    pub fn new() -> ScoreBoard {
+    pub const fn new() -> ScoreBoard {
         let sca: [ScoreSet; NSC] = [ScoreSet::init(); NSC];
 
-        let mut sbt: [[LinkedList<u32>; COL as usize]; ROW as usize] = [
+        let mut sbt: [[showtype!(u32, 16); COL as usize]; ROW as usize] = [
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
+                vec_macro!(0 as u32, 16),
             ],
         ];
         let mut n: u32 = 0;
-        for i in 0..ROW {
-            for j in 0..COL {
+        let mut i: u64 = 0;
+        while i < ROW {
+            let mut j: u64 = 0;
+            while j < COL {
                 if ROW - i >= CONNECT {
                     // orizontal --
-                    for k in i..(i + CONNECT) {
-                        sbt[k as usize][j as usize].push_back(n);
+                    let mut k = i;
+                    while k < (i + CONNECT) {
+                        push!(sbt[k as usize][j as usize], n);
+                        k += 1;
                     }
                     n += 1;
                 }
 
                 if COL - j >= CONNECT {
                     // vertical |
-                    for k in j..(j + CONNECT) {
-                        sbt[i as usize][k as usize].push_back(n);
+                    let mut k = j;
+                    while k < (j + CONNECT) {
+                        push!(sbt[i as usize][k as usize], n);
+                        k += 1;
                     }
                     n += 1;
                 }
 
                 if (ROW - i >= CONNECT) && (COL - j >= CONNECT) {
                     // diagonal \
+                    let mut k = i;
                     let mut kk = j;
-                    for k in i..(i + CONNECT) {
-                        sbt[k as usize][kk as usize].push_back(n);
+                    while k < (i + CONNECT) {
+                        push!(sbt[k as usize][kk as usize], n);
+                        k += 1;
                         kk += 1;
                     }
                     n += 1;
@@ -180,14 +191,18 @@ impl ScoreBoard {
 
                 if (ROW - i >= CONNECT) && (j + 1 >= CONNECT) {
                     // diagonal /
+                    let mut k = i;
                     let mut kk = j;
-                    for k in i..(i + CONNECT) {
-                        sbt[k as usize][kk as usize].push_back(n);
+                    while k < (i + CONNECT) {
+                        push!(sbt[k as usize][kk as usize], n);
+                        k += 1;
                         kk = kk.saturating_sub(1);
                     }
                     n += 1;
                 }
+                j += 1;
             }
+            i += 1;
         }
 
         let sb = sbt;

@@ -8,6 +8,8 @@ mod score;
 mod score_board;
 mod timer;
 mod transposition_table;
+mod vec_array;
+mod vec_macro;
 
 #[cfg(target_family = "wasm")]
 extern crate console_error_panic_hook;

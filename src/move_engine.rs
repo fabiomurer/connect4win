@@ -232,6 +232,7 @@ mod tests {
         let mut board = Board::new();
         board.make_move(3);
         let mut e = Engine::new(3, 100_000);
+        e.get_ready();
 
         let start = Instant::now();
         _ = e.alpha_beta(&mut board, MIN, MAX, 12);

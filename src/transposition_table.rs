@@ -69,6 +69,7 @@ mod tests {
     #[test]
     fn getset() {
         let mut table = Table::new(100);
+        table.get_ready();
         let mut bitboard = BitBoard::new();
         bitboard.make_move(0, &crate::board::Player::P1);
         table.set(bitboard, EQUAL);
