@@ -96,62 +96,8 @@ impl ScoreBoard {
     pub const fn new() -> ScoreBoard {
         let sca: [ScoreSet; NSC] = [ScoreSet::init(); NSC];
 
-        let mut sbt: [[showtype!(u32, 16); COL as usize]; ROW as usize] = [
-            [
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-            ],
-            [
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-            ],
-            [
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-            ],
-            [
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-            ],
-            [
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-            ],
-            [
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-                vec_macro!(0 as u32, 16),
-            ],
-        ];
+        let mut sbt: [[showtype!(u32, 16); COL as usize]; ROW as usize] =
+            [[vec_macro!(0 as u32, 16); COL as usize]; ROW as usize];
         let mut n: u32 = 0;
         let mut i: u64 = 0;
         while i < ROW {
