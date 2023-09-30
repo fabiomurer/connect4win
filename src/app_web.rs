@@ -195,9 +195,14 @@ fn App(cx: Scope) -> Element {
                                 "min": 1,
                                 value: "{p1t}",
                                 oninput: move |evt| {
-                                    let n: u64 = evt.value.parse().unwrap();
-                                    p1t.set(n);
-                                    e1.with_mut(|e1| e1.set_time(n))
+                                    if !evt.value.is_empty() {
+                                        let n: u64 = match evt.value.parse() {
+                                            Err(_) => *p1t.get(),
+                                            Ok(num) => num
+                                        };
+                                        p1t.set(n);
+                                        e1.with_mut(|e1| e1.set_time(n))
+                                    }
                                 }
                             }
                             label {
@@ -213,9 +218,14 @@ fn App(cx: Scope) -> Element {
                                 "step": 50_000,
                                 value: "{p1m}",
                                 oninput: move |evt| {
-                                    let n: usize = evt.value.parse().unwrap();
-                                    p1m.set(n);
-                                    e1.with_mut(|e1| e1.set_table(n))
+                                    if !evt.value.is_empty() {
+                                        let n: usize = match evt.value.parse() {
+                                            Err(_) => DEFAULT_TABLE_SIZE,
+                                            Ok(num) => num
+                                        };
+                                        p1m.set(n);
+                                        e1.with_mut(|e1| e1.set_table(n))
+                                    }
                                 }
                             }
                             label {
@@ -262,9 +272,14 @@ fn App(cx: Scope) -> Element {
                                 "min": 1,
                                 value: "{p2t}",
                                 oninput: move |evt| {
-                                    let n: u64 = evt.value.parse().unwrap();
-                                    p2t.set(n);
-                                    e2.with_mut(|e2| e2.set_time(n))
+                                    if !evt.value.is_empty() {
+                                        let n: u64 = match evt.value.parse() {
+                                            Err(_) => *p1t.get(),
+                                            Ok(num) => num
+                                        };
+                                        p2t.set(n);
+                                        e2.with_mut(|e2| e2.set_time(n))
+                                    }
                                 }
                             }
                             label {
@@ -280,9 +295,14 @@ fn App(cx: Scope) -> Element {
                                 "step": 50_000,
                                 value: "{p2m}",
                                 oninput: move |evt| {
-                                    let n: usize = evt.value.parse().unwrap();
-                                    p2m.set(n);
-                                    e2.with_mut(|e2| e2.set_table(n))
+                                    if !evt.value.is_empty() {
+                                        let n: usize = match evt.value.parse() {
+                                            Err(_) => DEFAULT_TABLE_SIZE,
+                                            Ok(num) => num
+                                        };
+                                        p2m.set(n);
+                                        e2.with_mut(|e2| e2.set_table(n))
+                                    }
                                 }
                             }
                             label {
