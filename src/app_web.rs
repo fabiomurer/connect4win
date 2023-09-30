@@ -95,6 +95,7 @@ fn Board(cx: Scope) -> Element {
             },
             div {
                 button {
+                    disabled: board.read().is_empty(), 
                     onclick: move |_| {
                         board.write().unmake_move();
                     },
