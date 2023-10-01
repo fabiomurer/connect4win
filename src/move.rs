@@ -4,7 +4,7 @@ use std::fmt::Display;
 use crate::board::*;
 use crate::score::*;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Move {
     col: u8,
     player: Player,

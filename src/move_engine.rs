@@ -3,6 +3,7 @@ use crate::r#move::*;
 use crate::score::*;
 use crate::timer::*;
 use crate::transposition_table::*;
+use crate::vec_array::*;
 
 pub struct Engine {
     timer: Timer,
@@ -25,10 +26,10 @@ impl Engine {
         self.table.set_size(table_size);
     }
 
-    fn move_sort(board: &mut Board) -> Vec<u8> {
+    fn move_sort(board: &mut Board) -> VecArray<u8, UCOL> {
         let v = board.legal_moves();
-        let mut mv: Vec<Move> = Vec::with_capacity(COL as usize);
-        let mut out: Vec<u8> = Vec::with_capacity(COL as usize);
+        let mut mv: VecArray<Move, UCOL> = VecArray::new();
+        let mut out: VecArray<u8, UCOL> = VecArray::new();
 
         for m in v {
             board.make_move(m);
@@ -62,7 +63,7 @@ impl Engine {
         match saved_score {
             Some(score) => Ok(score),
             None => {
-                let moves: Vec<u8>;
+                let moves: VecArray<u8, UCOL>;
                 let mut eval: Score;
 
                 if depth == 0 || board.gamestate() != GameState::Open {
@@ -120,16 +121,16 @@ impl Engine {
     fn move_list(
         &mut self,
         board: &mut Board,
-        prev_ml: &Vec<Move>,
+        prev_ml: &VecArray<Move, UCOL>,
         depth: u8,
-    ) -> Result<Vec<Move>, TimeoutError> {
+    ) -> Result<VecArray<Move, UCOL>, TimeoutError> {
         let mut alpha = MIN;
         let mut beta = MAX;
-        let mut out: Vec<Move> = Vec::with_capacity(COL as usize);
+        let mut out: VecArray<Move, UCOL> = VecArray::new();
 
         match board.player() {
             Player::P1 => {
-                for m in prev_ml {
+                for m in *prev_ml {
                     self.timer.check()?;
                     match m.score().state {
                         GameState::Open => {
@@ -141,13 +142,13 @@ impl Engine {
                             alpha = alpha.max(newscore);
                         }
                         _ => {
-                            out.push(*m);
+                            out.push(m);
                         }
                     }
                 }
             }
             Player::P2 => {
-                for m in prev_ml {
+                for m in *prev_ml {
                     self.timer.check()?;
                     match m.score().state {
                         GameState::Open => {
@@ -159,7 +160,7 @@ impl Engine {
                             beta = beta.min(newscore);
                         }
                         _ => {
-                            out.push(*m);
+                            out.push(m);
                         }
                     }
                 }
@@ -168,8 +169,8 @@ impl Engine {
         Ok(out)
     }
 
-    fn init_move_array(board: &Board) -> Vec<Move> {
-        let mut out: Vec<Move> = Vec::with_capacity(COL as usize);
+    fn init_move_array(board: &Board) -> VecArray<Move, UCOL> {
+        let mut out: VecArray<Move, UCOL> = VecArray::new();
         let cols = board.legal_moves();
         for c in cols {
             out.push(Move::new(c, board.player(), EQUAL, 0));
@@ -222,7 +223,7 @@ mod tests {
     fn ml() {
         let mut b = Board::new();
         let ml = Engine::move_sort(&mut b);
-        assert_eq!(ml, [3, 4, 2, 5, 1, 6, 0])
+        assert_eq!(ml.get_array(), [3, 4, 2, 5, 1, 6, 0])
     }
 
     #[test]

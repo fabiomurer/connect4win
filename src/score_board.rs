@@ -160,6 +160,8 @@ impl ScoreBoard {
     }
 }
 
+pub const SCORE_BOARD: ScoreBoard = ScoreBoard::new();
+
 #[cfg(test)]
 mod tests {
     use super::ScoreBoard;

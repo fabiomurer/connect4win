@@ -1,11 +1,15 @@
 use crate::bit_board::*;
 use crate::score::*;
 use crate::score_board::*;
+use crate::vec_array::*;
 use std::cmp::Ordering;
 
 pub const COL: u64 = 7;
 pub const ROW: u64 = 6;
+pub const UCOL: usize = 7;
+pub const UROW: usize = 6;
 pub const CONNECT: u64 = 4;
+pub const LEN: usize = (COL * ROW) as usize;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GameState {
@@ -51,15 +55,16 @@ impl Ord for GameState {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+#[derive(Debug, Clone, PartialEq, Eq, Copy, Default)]
 pub enum Player {
+    #[default]
     P1,
     P2,
 }
 
 #[derive(Clone, PartialEq)]
 struct MoveStack {
-    moves: Vec<u8>,
+    moves: VecArray<u8, LEN>,
 }
 
 impl MoveStack {
@@ -67,11 +72,11 @@ impl MoveStack {
         self.moves.push(col);
     }
     pub fn pop_move(&mut self) -> u8 {
-        self.moves.pop().unwrap()
+        self.moves.pop()
     }
     pub fn new() -> MoveStack {
         MoveStack {
-            moves: Vec::with_capacity((COL * ROW) as usize),
+            moves: VecArray::new(),
         }
     }
 }
@@ -132,8 +137,8 @@ impl Board {
             .unmake_move(row as usize, col as usize, &self.player);
     }
 
-    pub fn legal_moves(&self) -> Vec<u8> {
-        let mut v: Vec<u8> = Vec::with_capacity(COL as usize);
+    pub fn legal_moves(&self) -> VecArray<u8, UCOL> {
+        let mut v: VecArray<u8, UCOL> = VecArray::new();
         let spaces = self.bitboard.get_space_array();
         for (col, i) in spaces.iter().enumerate() {
             if *i > 0 {
@@ -159,7 +164,7 @@ impl Board {
         Board {
             movestack: MoveStack::new(),
             bitboard: BitBoard::new(),
-            scoreboard: ScoreBoard::new(),
+            scoreboard: SCORE_BOARD,
             gamestate: GameState::Open,
             player: Player::P1,
         }
