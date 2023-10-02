@@ -165,6 +165,20 @@ impl Board {
         }
     }
 
+    pub fn set_from_pos_string(&mut self, pos: &str) {
+        *self = Board::new();
+        for c in pos.chars() {
+            let col: u8 = c.to_digit(10).unwrap() as u8;
+            self.make_move(col)
+        }
+    }
+
+    pub fn from_position(pos: &str) -> Board {
+        let mut b = Board::new();
+        b.set_from_pos_string(pos);
+        b
+    }
+
     pub fn player(&self) -> Player {
         self.player
     }

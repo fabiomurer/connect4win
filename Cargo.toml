@@ -3,10 +3,19 @@ name = "connect4win"
 version = "0.1.0"
 edition = "2021"
 
+authors = ["Fabio Murer <murer.fabio23@gmail.com>"]
+description = "A connect-four engine"
+repository = "https://github.com/zwirgioIlredelCodice/connect4win"
+
+license = "GPL-3.0-or-later"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
 lto = true
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+clap = { version = "4.4.6", features = ["derive"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 dioxus = "0.4.0"
