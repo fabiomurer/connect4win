@@ -57,16 +57,6 @@ impl PartialOrd for Move {
 
 impl Ord for Move {
     fn cmp(&self, other: &Self) -> Ordering {
-        let compare_score = self.score.cmp(&other.score);
-
-        if compare_score == Ordering::Equal {
-            let col: i32 = 7;
-            let half_row = col / 2;
-            let distance_a = ((self.col as i32) - half_row).abs();
-            let distance_b = ((other.col as i32) - half_row).abs();
-            distance_b.cmp(&distance_a)
-        } else {
-            compare_score
-        }
+        self.score.cmp(&other.score)
     }
 }

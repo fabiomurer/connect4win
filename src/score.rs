@@ -4,7 +4,7 @@ use crate::board::{GameState, COL, ROW};
 /// W2 + depth for WinP2
 pub type Score = i32;
 
-pub const W1: Score = 1000;
+pub const W1: Score = 10_000;
 pub const W2: Score = -W1;
 
 pub const EQUAL: Score = 0;

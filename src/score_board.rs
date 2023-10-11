@@ -1,6 +1,15 @@
 use crate::board::*;
 use std::collections::LinkedList;
 
+const WEIGHTS: [[i32; COL as usize]; ROW as usize] = [
+    [0, 1, 2, 3, 2, 1, 0],
+    [0, 1, 2, 3, 2, 1, 0],
+    [0, 1, 2, 3, 2, 1, 0],
+    [0, 1, 2, 3, 2, 1, 0],
+    [0, 1, 2, 3, 2, 1, 0],
+    [0, 1, 2, 3, 2, 1, 0],
+];
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ScoreSet {
     score: i32,
@@ -73,7 +82,11 @@ impl ScoreBoard {
 
             delta_score += sc.score - ps;
         }
-        self.total_score += delta_score;
+        self.total_score += delta_score * 10;
+        match player {
+            Player::P1 => self.total_score += WEIGHTS[row][col],
+            Player::P2 => self.total_score -= WEIGHTS[row][col],
+        }
         win
     }
 
@@ -87,7 +100,11 @@ impl ScoreBoard {
 
             delta_score += sc.score - ps;
         }
-        self.total_score += delta_score;
+        self.total_score += delta_score * 10;
+        match player {
+            Player::P1 => self.total_score -= WEIGHTS[row][col],
+            Player::P2 => self.total_score += WEIGHTS[row][col],
+        }
     }
 
     pub fn new() -> ScoreBoard {
