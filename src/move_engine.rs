@@ -27,21 +27,21 @@ impl Engine {
 
     fn move_sort(board: &mut Board) -> Vec<u8> {
         let v = board.legal_moves();
-        let mut mv: Vec<Move> = Vec::with_capacity(COL as usize);
-        let mut out: Vec<u8> = Vec::with_capacity(COL as usize);
+        let mut s: Vec<(Score, u8)> = Vec::with_capacity(v.len());
+        let mut out: Vec<u8> = Vec::with_capacity(v.len());
 
         for m in v {
             board.make_move(m);
-            mv.push(Move::new(m, board.player(), board.evaluate(), 1));
+            s.push((board.evaluate(), m));
             board.unmake_move();
         }
-        mv.sort();
+        s.sort_by_key(|k| k.0);
         if board.player() == Player::P1 {
-            mv.reverse();
+            s.reverse();
         }
 
-        for m in mv {
-            out.push(m.col());
+        for m in s {
+            out.push(m.1);
         }
         out
     }
@@ -50,7 +50,7 @@ impl Engine {
         &mut self,
         board: &mut Board,
         mut alpha: Score,
-        mut beta: Score,
+        beta: Score,
         depth: u8,
     ) -> Result<Score, TimeoutError> {
         let saved_score: Option<Score> = if depth >= 1 {
@@ -63,7 +63,7 @@ impl Engine {
             Some(score) => Ok(score),
             None => {
                 let moves: Vec<u8>;
-                let mut eval: Score;
+                let mut bestscore: Score = MIN;
 
                 if depth == 0 || board.gamestate() != GameState::Open {
                     return Ok(board.evaluate());
@@ -73,26 +73,29 @@ impl Engine {
                     } else {
                         moves = board.legal_moves();
                     }
-
-                    eval = MIN;
                     for m in moves {
                         self.timer.check()?;
 
                         board.make_move(m);
-                        let newscore = self.alpha_beta(board, -alpha, -beta, depth - 1)?;
+                        let score = -self.alpha_beta(board, -beta, -alpha, depth - 1)?;
                         board.unmake_move();
 
-                        eval = eval.max(newscore);
-                        alpha = alpha.max(eval);
-                        if alpha > beta {
+                        if score >= beta {
+                            bestscore = score;
                             break;
+                        }
+                        if score > bestscore {
+                            bestscore = score;
+                            if score > alpha {
+                                alpha = score
+                            }
                         }
                     }
                 }
                 if depth >= 1 {
-                    self.table.set(board.bitboard(), eval);
+                    self.table.set(board.bitboard(), bestscore);
                 }
-                Ok(eval)
+                Ok(bestscore)
             }
         }
     }
@@ -103,8 +106,8 @@ impl Engine {
         prev_ml: &Vec<Move>,
         depth: u8,
     ) -> Result<Vec<Move>, TimeoutError> {
-        let mut alpha = MIN;
-        let mut beta = MAX;
+        let alpha = MIN;
+        let beta = MAX;
         let mut out: Vec<Move> = Vec::with_capacity(COL as usize);
 
         for m in prev_ml {
@@ -127,7 +130,7 @@ impl Engine {
             board.unmake_move();
 
             out.push(Move::new(m.col(), m.player(), newscore, depth));
-            alpha = alpha.max(newscore);
+            //alpha = alpha.max(newscore);
         }
         Ok(out)
     }
@@ -163,9 +166,9 @@ impl Engine {
             match self.move_list(&mut tb, &movelist, i) {
                 Ok(mut ml) => {
                     ml.sort();
-                    if board.player() == Player::P1 {
+                    /*if board.player() == Player::P1 {
                         ml.reverse();
-                    }
+                    }*/
                     movelist = ml;
                     bestmove = movelist[0];
                 }
