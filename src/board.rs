@@ -143,8 +143,17 @@ impl Board {
         v
     }
 
+    pub fn nmoves(&self) -> u8 {
+        self.movestack.moves.len() as u8
+    }
+
     pub fn evaluate(&self) -> Score {
-        Score::new(self.scoreboard.total_score(), self.gamestate)
+        match self.gamestate {
+            GameState::Open => self.scoreboard.total_score(),
+            GameState::Draw => 0,
+            GameState::WinP1 => W1 - self.nmoves() as i32,
+            GameState::WinP2 => W2 + self.nmoves() as i32,
+        }
     }
 
     pub fn free_cells(&self) -> u8 {

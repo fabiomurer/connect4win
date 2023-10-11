@@ -74,38 +74,18 @@ impl Engine {
                         moves = board.legal_moves();
                     }
 
-                    match board.player() {
-                        Player::P1 => {
-                            eval = MIN;
-                            for m in moves {
-                                self.timer.check()?;
+                    eval = MIN;
+                    for m in moves {
+                        self.timer.check()?;
 
-                                board.make_move(m);
-                                let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
-                                board.unmake_move();
+                        board.make_move(m);
+                        let newscore = self.alpha_beta(board, -alpha, -beta, depth - 1)?;
+                        board.unmake_move();
 
-                                eval = eval.max(newscore);
-                                alpha = alpha.max(eval);
-                                if alpha > beta {
-                                    break;
-                                }
-                            }
-                        }
-                        Player::P2 => {
-                            eval = MAX;
-                            for m in moves {
-                                self.timer.check()?;
-
-                                board.make_move(m);
-                                let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
-                                board.unmake_move();
-
-                                eval = eval.min(newscore);
-                                beta = beta.min(eval);
-                                if alpha > beta {
-                                    break;
-                                }
-                            }
+                        eval = eval.max(newscore);
+                        alpha = alpha.max(eval);
+                        if alpha > beta {
+                            break;
                         }
                     }
                 }
@@ -127,43 +107,27 @@ impl Engine {
         let mut beta = MAX;
         let mut out: Vec<Move> = Vec::with_capacity(COL as usize);
 
-        match board.player() {
-            Player::P1 => {
-                for m in prev_ml {
-                    self.timer.check()?;
-                    match m.score().state {
-                        GameState::Open => {
-                            board.make_move(m.col());
-                            let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
-                            board.unmake_move();
+        for m in prev_ml {
+            self.timer.check()?;
+            /*match m.score().gamestate() { // interpreta 0 come draw
+                GameState::Open => {
+                    board.make_move(m.col());
+                    let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
+                    board.unmake_move();
 
-                            out.push(Move::new(m.col(), m.player(), newscore, depth));
-                            alpha = alpha.max(newscore);
-                        }
-                        _ => {
-                            out.push(*m);
-                        }
-                    }
+                    out.push(Move::new(m.col(), m.player(), newscore, depth));
+                    alpha = alpha.max(newscore);
                 }
-            }
-            Player::P2 => {
-                for m in prev_ml {
-                    self.timer.check()?;
-                    match m.score().state {
-                        GameState::Open => {
-                            board.make_move(m.col());
-                            let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
-                            board.unmake_move();
+                _ => {
+                    out.push(*m);
+                }
+            }*/
+            board.make_move(m.col());
+            let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
+            board.unmake_move();
 
-                            out.push(Move::new(m.col(), m.player(), newscore, depth));
-                            beta = beta.min(newscore);
-                        }
-                        _ => {
-                            out.push(*m);
-                        }
-                    }
-                }
-            }
+            out.push(Move::new(m.col(), m.player(), newscore, depth));
+            alpha = alpha.max(newscore);
         }
         Ok(out)
     }
@@ -232,6 +196,7 @@ mod tests {
         let mut board = Board::new();
         board.make_move(3);
         let mut e = Engine::new(3, 100_000);
+        e.get_ready();
 
         let start = Instant::now();
         _ = e.alpha_beta(&mut board, MIN, MAX, 12);

@@ -1,128 +1,35 @@
-use crate::board::*;
-use std::cmp::Ordering;
+use crate::board::{GameState, COL, ROW};
+/// 0 for draw,
+/// W1 - depth for WinP1
+/// W2 + depth for WinP2
+pub type Score = i32;
 
-#[derive(Debug, Clone, Copy)]
-pub struct Score {
-    pub score: i32,
-    pub state: GameState,
+pub const W1: Score = 1000;
+pub const W2: Score = -W1;
+
+pub const EQUAL: Score = 0;
+pub const MAX: Score = W1;
+pub const MIN: Score = W2;
+
+const MAXMOVES: i32 = (COL * ROW) as i32;
+
+const MINW1: Score = W1 - MAXMOVES;
+const MINW2: Score = W2 + MAXMOVES;
+
+pub trait ShowScore {
+    fn gamestate(&self) -> GameState;
 }
 
-impl Score {
-    pub fn new(score: i32, state: GameState) -> Self {
-        Self { score, state }
-    }
-}
-
-pub const MAX: Score = Score {
-    score: 0,
-    state: GameState::WinP1,
-};
-pub const MIN: Score = Score {
-    score: 0,
-    state: GameState::WinP2,
-};
-pub const EQUAL: Score = Score {
-    score: 0,
-    state: GameState::Open,
-};
-
-impl Default for Score {
-    fn default() -> Self {
-        Score {
-            score: 0,
-            state: GameState::Open,
-        }
-    }
-}
-
-impl Eq for Score {}
-
-impl PartialEq for Score {
-    fn eq(&self, other: &Self) -> bool {
-        if self.state == other.state {
-            true
+impl ShowScore for Score {
+    fn gamestate(&self) -> GameState {
+        if *self == 0 {
+            GameState::Draw
+        } else if *self <= MINW2 {
+            GameState::WinP2
+        } else if *self >= MINW1 {
+            GameState::WinP1
         } else {
-            self.score == other.score
+            GameState::Open
         }
-    }
-}
-
-impl PartialOrd for Score {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Score {
-    fn cmp(&self, other: &Self) -> Ordering {
-        if self.state == GameState::Open && other.state == GameState::Open {
-            self.score.cmp(&other.score)
-        } else {
-            self.state.cmp(&other.state)
-        }
-    }
-
-    fn max(self, other: Self) -> Self
-    where
-        Self: Sized,
-    {
-        if self > other {
-            self
-        } else {
-            other
-        }
-    }
-
-    fn min(self, other: Self) -> Self
-    where
-        Self: Sized,
-    {
-        if self < other {
-            self
-        } else {
-            other
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn cmpp() {
-        let s1 = MAX;
-        let s2 = EQUAL;
-        assert_eq!(MAX, s1.max(s2));
-
-        let s1 = Score {
-            score: 12,
-            state: GameState::Open,
-        };
-        let s2 = Score {
-            score: 0,
-            state: GameState::Open,
-        };
-        assert_eq!(s1, s2.max(s1));
-
-        let s1 = Score {
-            score: 12,
-            state: GameState::Draw,
-        };
-        let s2 = Score {
-            score: 0,
-            state: GameState::Open,
-        };
-        assert_eq!(s2, s2.max(s1));
-
-        let s1 = Score {
-            score: -4,
-            state: GameState::WinP1,
-        };
-        let s2 = Score {
-            score: -3,
-            state: GameState::WinP1,
-        };
-        assert_eq!(Ordering::Equal, s2.cmp(&s1));
     }
 }
