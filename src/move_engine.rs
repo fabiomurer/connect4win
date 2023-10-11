@@ -32,13 +32,10 @@ impl Engine {
 
         for m in v {
             board.make_move(m);
-            s.push((board.evaluate(), m));
+            s.push((-board.evaluate(), m));
             board.unmake_move();
         }
         s.sort_by_key(|k| k.0);
-        if board.player() == Player::P1 {
-            s.reverse();
-        }
 
         for m in s {
             out.push(m.1);
@@ -69,7 +66,8 @@ impl Engine {
                     return Ok(board.evaluate());
                 } else {
                     if depth >= 1 {
-                        moves = Self::move_sort(board);
+                        //moves = Self::move_sort(board); fa piu casino
+                        moves = board.legal_moves();
                     } else {
                         moves = board.legal_moves();
                     }
@@ -112,19 +110,7 @@ impl Engine {
 
         for m in prev_ml {
             self.timer.check()?;
-            /*match m.score().gamestate() { // interpreta 0 come draw
-                GameState::Open => {
-                    board.make_move(m.col());
-                    let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
-                    board.unmake_move();
 
-                    out.push(Move::new(m.col(), m.player(), newscore, depth));
-                    alpha = alpha.max(newscore);
-                }
-                _ => {
-                    out.push(*m);
-                }
-            }*/
             board.make_move(m.col());
             let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
             board.unmake_move();
@@ -166,11 +152,8 @@ impl Engine {
             match self.move_list(&mut tb, &movelist, i) {
                 Ok(mut ml) => {
                     ml.sort();
-                    /*if board.player() == Player::P1 {
-                        ml.reverse();
-                    }*/
                     movelist = ml;
-                    bestmove = movelist[0];
+                    bestmove = *movelist.last().unwrap();
                 }
                 Err(TimeoutError) => {
                     return bestmove;
