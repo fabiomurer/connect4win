@@ -113,12 +113,7 @@ impl Board {
     }
 
     pub fn evaluate(&self) -> Score {
-        match self.gamestate {
-            GameState::Open => self.scoreboard.total_score(),
-            GameState::Draw => 0,
-            GameState::WinP1 => W1 - self.nmoves() as i32,
-            GameState::WinP2 => W2 + self.nmoves() as i32,
-        }
+        getscore(self)
     }
 
     pub fn free_cells(&self) -> u8 {
@@ -163,6 +158,10 @@ impl Board {
 
     pub fn gamestate(&self) -> GameState {
         self.gamestate
+    }
+
+    pub fn scoreboard(&self) -> &ScoreBoard {
+        &self.scoreboard
     }
 }
 

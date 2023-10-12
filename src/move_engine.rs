@@ -132,7 +132,7 @@ impl Engine {
                 for m in prev_ml {
                     self.timer.check()?;
                     match m.score().gamestate() {
-                        GameState::Open | GameState::Draw => {
+                        GameState::Open => {
                             board.make_move(m.col());
                             let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
                             board.unmake_move();
@@ -150,7 +150,7 @@ impl Engine {
                 for m in prev_ml {
                     self.timer.check()?;
                     match m.score().gamestate() {
-                        GameState::Open | GameState::Draw => {
+                        GameState::Open => {
                             board.make_move(m.col());
                             let newscore = self.alpha_beta(board, alpha, beta, depth - 1)?;
                             board.unmake_move();
