@@ -1,5 +1,4 @@
 use crate::board::*;
-use std::collections::LinkedList;
 
 const WEIGHTS: [[i32; COL as usize]; ROW as usize] = [
     [0, 1, 2, 3, 2, 1, 0],
@@ -58,7 +57,7 @@ const NSC: usize = 207; // chissà se è giosto
 #[derive(Clone, PartialEq)]
 pub struct ScoreBoard {
     total_score: i32,
-    scoreboard: [[LinkedList<u32>; COL as usize]; ROW as usize],
+    scoreboard: [[Vec<u32>; COL as usize]; ROW as usize],
     scoresets: [ScoreSet; NSC],
 }
 
@@ -110,60 +109,60 @@ impl ScoreBoard {
     pub fn new() -> ScoreBoard {
         let sca: [ScoreSet; NSC] = [ScoreSet::init(); NSC];
 
-        let mut sbt: [[LinkedList<u32>; COL as usize]; ROW as usize] = [
+        let mut sbt: [[Vec<u32>; COL as usize]; ROW as usize] = [
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
             ],
             [
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
-                LinkedList::new(),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
+                Vec::with_capacity(16),
             ],
         ];
         let mut n: u32 = 0;
@@ -172,7 +171,7 @@ impl ScoreBoard {
                 if ROW - i >= CONNECT {
                     // orizontal --
                     for k in i..(i + CONNECT) {
-                        sbt[k as usize][j as usize].push_back(n);
+                        sbt[k as usize][j as usize].push(n);
                     }
                     n += 1;
                 }
@@ -180,7 +179,7 @@ impl ScoreBoard {
                 if COL - j >= CONNECT {
                     // vertical |
                     for k in j..(j + CONNECT) {
-                        sbt[i as usize][k as usize].push_back(n);
+                        sbt[i as usize][k as usize].push(n);
                     }
                     n += 1;
                 }
@@ -189,7 +188,7 @@ impl ScoreBoard {
                     // diagonal \
                     let mut kk = j;
                     for k in i..(i + CONNECT) {
-                        sbt[k as usize][kk as usize].push_back(n);
+                        sbt[k as usize][kk as usize].push(n);
                         kk += 1;
                     }
                     n += 1;
@@ -199,7 +198,7 @@ impl ScoreBoard {
                     // diagonal /
                     let mut kk = j;
                     for k in i..(i + CONNECT) {
-                        sbt[k as usize][kk as usize].push_back(n);
+                        sbt[k as usize][kk as usize].push(n);
                         kk = kk.saturating_sub(1);
                     }
                     n += 1;
@@ -224,12 +223,12 @@ mod tests {
     fn lel() {
         let mut ss: ScoreBoard = ScoreBoard::new();
         ss.make_move(0, 0, &crate::board::Player::P1);
-        assert_eq!(ss.total_score, 3);
+        assert_eq!(ss.total_score, 30);
         ss.make_move(0, 6, &crate::board::Player::P2);
         assert_eq!(ss.total_score, 0);
         let mut ss: ScoreBoard = ScoreBoard::new();
         ss.make_move(0, 0, &crate::board::Player::P2);
-        assert_eq!(ss.total_score, -3);
+        assert_eq!(ss.total_score, -30);
         ss.make_move(0, 6, &crate::board::Player::P1);
         assert_eq!(ss.total_score, 0)
     }
