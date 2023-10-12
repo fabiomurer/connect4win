@@ -7,48 +7,13 @@ pub const COL: u64 = 7;
 pub const ROW: u64 = 6;
 pub const CONNECT: u64 = 4;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Default)]
 pub enum GameState {
+    #[default]
     Open,
     Draw,
     WinP1,
     WinP2,
-}
-
-impl PartialOrd for GameState {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-impl Ord for GameState {
-    fn cmp(&self, other: &Self) -> Ordering {
-        match self {
-            GameState::Open => match other {
-                GameState::Open => Ordering::Equal,
-                GameState::Draw => Ordering::Greater,
-                GameState::WinP1 => Ordering::Less,
-                GameState::WinP2 => Ordering::Greater,
-            },
-            GameState::Draw => match other {
-                GameState::Open => Ordering::Less,
-                GameState::Draw => Ordering::Equal,
-                GameState::WinP1 => Ordering::Less,
-                GameState::WinP2 => Ordering::Greater,
-            },
-            GameState::WinP1 => match other {
-                GameState::Open => Ordering::Greater,
-                GameState::Draw => Ordering::Greater,
-                GameState::WinP1 => Ordering::Equal,
-                GameState::WinP2 => Ordering::Greater,
-            },
-            GameState::WinP2 => match other {
-                GameState::Open => Ordering::Less,
-                GameState::Draw => Ordering::Less,
-                GameState::WinP1 => Ordering::Less,
-                GameState::WinP2 => Ordering::Equal,
-            },
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Copy)]
