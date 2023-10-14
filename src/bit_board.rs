@@ -101,6 +101,51 @@ impl BitBoard {
     }
 }
 
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
+pub struct DoubleBitBoard {
+    normal: BitBoard,
+    mirrored: BitBoard,
+}
+
+impl DoubleBitBoard {
+    pub fn new() -> Self {
+        DoubleBitBoard {
+            normal: BitBoard::new(),
+            mirrored: BitBoard::new(),
+        }
+    }
+    pub fn is_full(&self) -> bool {
+        self.normal.is_full()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.normal.is_empty()
+    }
+    pub fn get_space(&self, col: u64) -> u64 {
+        self.normal.get_space(col)
+    }
+    pub fn get_space_array(&self) -> [u64; 7] {
+        self.normal.get_space_array()
+    }
+    pub fn make_move(&mut self, col: u64, player: &Player) {
+        self.normal.make_move(col, player);
+        self.mirrored.make_move((COL - 1) - col, player);
+    }
+    pub fn unmake_move(&mut self, col: u64, player: &Player) {
+        self.normal.unmake_move(col, player);
+        self.mirrored.unmake_move((COL - 1) - col, player);
+    }
+    pub fn print(&self) {
+        self.normal.print();
+    }
+
+    pub fn board(&self) -> BitBoard {
+        self.normal
+    }
+    pub fn board_mirrored(&self) -> BitBoard {
+        self.mirrored
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::BitBoard;

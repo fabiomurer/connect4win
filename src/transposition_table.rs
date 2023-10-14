@@ -42,18 +42,27 @@ impl Table {
         n % self.size
     }
 
-    pub fn get(&self, key: &BitBoard) -> Option<Score> {
-        let index = self.get_index(key);
-        if self.table[index].key == *key {
-            Some(self.table[index].score)
+    pub fn get(&self, key: &DoubleBitBoard) -> Option<Score> {
+        let index1 = self.get_index(&key.board());
+        if self.table[index1].key == key.board() {
+            Some(self.table[index1].score)
         } else {
-            None
+            // check if is stored as a mirrored position
+            let index2 = self.get_index(&key.board_mirrored());
+            if self.table[index2].key == key.board_mirrored() {
+                Some(self.table[index2].score)
+            } else {
+                None
+            }
         }
     }
 
-    pub fn set(&mut self, key: BitBoard, score: Score) {
-        let index = self.get_index(&key);
-        let entry: Entry = Entry { score, key };
+    pub fn set(&mut self, key: DoubleBitBoard, score: Score) {
+        let index = self.get_index(&key.board());
+        let entry: Entry = Entry {
+            score,
+            key: key.board(),
+        };
         self.table[index] = entry;
     }
 
@@ -69,7 +78,8 @@ mod tests {
     #[test]
     fn getset() {
         let mut table = Table::new(100);
-        let mut bitboard = BitBoard::new();
+        table.get_ready();
+        let mut bitboard = DoubleBitBoard::new();
         bitboard.make_move(0, &crate::board::Player::P1);
         table.set(bitboard, EQUAL);
         let sc = table.get(&bitboard).unwrap();

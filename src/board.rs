@@ -44,7 +44,7 @@ impl MoveStack {
 #[derive(Clone, PartialEq)]
 pub struct Board {
     movestack: MoveStack,
-    bitboard: BitBoard,
+    bitboard: DoubleBitBoard,
     scoreboard: ScoreBoard,
     gamestate: GameState,
     player: Player,
@@ -127,7 +127,7 @@ impl Board {
     pub fn new() -> Board {
         Board {
             movestack: MoveStack::new(),
-            bitboard: BitBoard::new(),
+            bitboard: DoubleBitBoard::new(),
             scoreboard: ScoreBoard::new(),
             gamestate: GameState::Open,
             player: Player::P1,
@@ -152,7 +152,7 @@ impl Board {
         self.player
     }
 
-    pub fn bitboard(&self) -> BitBoard {
+    pub fn bitboard(&self) -> DoubleBitBoard {
         self.bitboard
     }
 
@@ -175,7 +175,7 @@ mod tests {
         b.make_move(3);
         b.unmake_move();
 
-        assert_eq!(b.bitboard(), BitBoard::new());
+        assert_eq!(b.bitboard(), DoubleBitBoard::new());
         assert_eq!(b.movestack.moves.len(), 0);
         assert_eq!(b.scoreboard.total_score(), 0);
         assert_eq!(b.player, Player::P1);
