@@ -2,6 +2,7 @@ mod app_console;
 mod app_web;
 mod bit_board;
 mod board;
+mod game_database;
 mod r#move;
 mod move_engine;
 mod score;
