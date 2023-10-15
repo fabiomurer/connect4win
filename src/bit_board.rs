@@ -2,14 +2,12 @@ use crate::board::*;
 use std::hash::Hash;
 
 #[cfg(not(target_family = "wasm"))]
-use bincode;
-#[cfg(not(target_family = "wasm"))]
 use serde::{Deserialize, Serialize};
 
 const INIT_BITBOARD: u64 =
     0b0_110_110_110_110_110_110_110_000000000000000000000000000000000000000000;
 
-#[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Debug, PartialOrd, Ord)]
 #[cfg(not(target_family = "wasm"))]
 #[derive(Serialize, Deserialize)]
 pub struct BitBoard {
@@ -109,8 +107,8 @@ impl BitBoard {
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
 pub struct DoubleBitBoard {
-    normal: BitBoard,
-    mirrored: BitBoard,
+    pub(crate) normal: BitBoard,
+    pub(crate) mirrored: BitBoard,
 }
 
 impl DoubleBitBoard {

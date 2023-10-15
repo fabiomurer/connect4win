@@ -1,10 +1,15 @@
-use crate::bit_board::BitBoard;
+use crate::bit_board::*;
 use crate::score::*;
 use bincode;
 use serde::{Deserialize, Serialize};
-use serde_big_array::BigArray;
+
+use std::fs::*;
+use std::io::BufReader;
 
 const ENTRYS: usize = 4200899;
+
+const DBIN: &str = "./database/db-12ply-distance.txt";
+const DBOUT: &str = "./database/db-12ply-distance";
 
 #[derive(Clone, Default, Serialize, Deserialize, Copy)]
 struct Entry {
@@ -14,17 +19,33 @@ struct Entry {
 
 #[derive(Serialize, Deserialize)]
 pub struct GameDatabase {
-    #[serde(with = "BigArray")]
-    data: [Entry; ENTRYS],
+    data: Vec<Entry>,
 }
 
 impl GameDatabase {
     pub fn new() -> GameDatabase {
-        let data: [Entry; ENTRYS] = [Entry::default(); ENTRYS];
-        GameDatabase { data: data }
+        let file_db = File::open(DBOUT).unwrap();
+        let reader = BufReader::new(file_db);
+        let data = bincode::deserialize_from(reader).unwrap();
+        GameDatabase { data }
     }
-    pub fn insert(&mut self, entry: &Entry, index: usize) {
-        self.data[index] = *entry;
+
+    pub fn get(&self, key: &DoubleBitBoard) -> Score {
+        match self.data.binary_search_by_key(&key.board(), |e| e.key) {
+            Ok(index) => self.data[index].score,
+            Err(_) => {
+                self.data[self
+                    .data
+                    .binary_search_by_key(&key.board_mirrored(), |e| e.key)
+                    .unwrap()]
+                .score
+            }
+        }
+    }
+
+    fn set_data(&mut self, mut data: Vec<Entry>) {
+        data.sort_by_key(|e| e.key);
+        self.data = data;
     }
 }
 
@@ -38,8 +59,6 @@ mod test {
     use std::path::Path;
     use std::str::FromStr;
 
-    const DBPATH: &str = "./database/db-12ply-distance.txt";
-    const DBOUT: &str = "./database/db-12ply-distance";
     fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
     where
         P: AsRef<Path>,
@@ -79,20 +98,24 @@ mod test {
         };
     }
 
+    // RUST_MIN_STACK=10485760000 cargo test make_game_database -- --nocapture
+    /// convert db-12ply-distance.txt to binary file ready to use
     #[test]
     fn make_game_database() {
         let mut nlines = 0;
-        let mut gd = GameDatabase::new();
-        if let Ok(lines) = read_lines(DBPATH) {
+        let mut data: Vec<Entry> = Vec::with_capacity(ENTRYS);
+        if let Ok(lines) = read_lines(DBIN) {
             // Consumes the iterator, returns an (Optional) String
             for (i, line) in lines.enumerate() {
                 if let Ok(ip) = line {
                     let e = line_to_entry(ip.as_str());
-                    gd.insert(&e, i)
+                    data.push(e);
                 }
                 nlines = i;
             }
         }
+        let mut gd = GameDatabase { data: Vec::new() };
+        gd.set_data(data);
         let sas = bincode::serialize(&gd).unwrap();
         println!("size is (byte){}, line readed {}", sas.len(), nlines);
 
@@ -100,5 +123,16 @@ mod test {
         bincode::serialize_into(&mut fout, &sas).unwrap();
 
         assert_eq!(ENTRYS - 1, nlines)
+    }
+
+    #[test]
+    fn getto() {
+        let db = GameDatabase::new();
+        let e = line_to_entry("1.....11222.122211.\n");
+        let bb = DoubleBitBoard {
+            normal: e.key,
+            mirrored: e.key,
+        };
+        assert_eq!(db.get(&bb), e.score)
     }
 }
