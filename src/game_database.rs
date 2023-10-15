@@ -1,11 +1,13 @@
 use crate::bit_board::*;
 use crate::score::*;
 use bincode;
+use bincode::config::Infinite;
 use serde::{Deserialize, Serialize};
 
 use std::fs::*;
 use std::io::BufReader;
 
+pub const PLY: u8 = 12;
 const ENTRYS: usize = 4200899;
 
 const DBIN: &str = "./database/db-12ply-distance.txt";
@@ -34,11 +36,16 @@ impl GameDatabase {
         match self.data.binary_search_by_key(&key.board(), |e| e.key) {
             Ok(index) => self.data[index].score,
             Err(_) => {
-                self.data[self
+                match self
                     .data
                     .binary_search_by_key(&key.board_mirrored(), |e| e.key)
-                    .unwrap()]
-                .score
+                {
+                    Ok(index) => self.data[index].score,
+                    Err(_) => {
+                        key.board().print();
+                        panic!("no DB?")
+                    }
+                }
             }
         }
     }
@@ -116,11 +123,9 @@ mod test {
         }
         let mut gd = GameDatabase { data: Vec::new() };
         gd.set_data(data);
-        let sas = bincode::serialize(&gd).unwrap();
-        println!("size is (byte){}, line readed {}", sas.len(), nlines);
 
         let mut fout = BufWriter::new(File::create(DBOUT).unwrap());
-        bincode::serialize_into(&mut fout, &sas).unwrap();
+        bincode::serialize_into(&mut fout, &gd).unwrap();
 
         assert_eq!(ENTRYS - 1, nlines)
     }
@@ -128,7 +133,7 @@ mod test {
     #[test]
     fn getto() {
         let db = GameDatabase::new();
-        let e = line_to_entry("1.....11222.122211.\n");
+        let e = line_to_entry("1.....12112.212212. 79");
         let bb = DoubleBitBoard {
             normal: e.key,
             mirrored: e.key,

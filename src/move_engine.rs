@@ -1,4 +1,6 @@
 use crate::board::*;
+#[cfg(not(target_family = "wasm"))]
+use crate::game_database::*;
 use crate::r#move::*;
 use crate::score::*;
 use crate::timer::*;
@@ -7,6 +9,8 @@ use crate::transposition_table::*;
 pub struct Engine {
     timer: Timer,
     table: Table,
+    #[cfg(not(target_family = "wasm"))]
+    database: GameDatabase,
 }
 
 impl Engine {
@@ -14,6 +18,7 @@ impl Engine {
         Engine {
             timer: Timer::new(seconds),
             table: Table::new(table_size),
+            database: GameDatabase::new(),
         }
     }
 
@@ -53,7 +58,9 @@ impl Engine {
         mut beta: Score,
         depth: u8,
     ) -> Result<Score, TimeoutError> {
-        let saved_score: Option<Score> = if depth >= 1 {
+        let saved_score: Option<Score> = if board.nmoves() == PLY {
+            Some(self.database.get(&board.bitboard()))
+        } else if depth >= 1 {
             self.table.get(&board.bitboard())
         } else {
             None
@@ -238,5 +245,14 @@ mod tests {
         _ = e.alpha_beta(&mut board, MIN, MAX, 12);
         let duration = start.elapsed();
         println!("Time elapsed in alpha_beta is: {:?}", duration);
+    }
+
+    #[test]
+    fn dtb() {
+        let mut board = Board::new();
+        let mut e = Engine::new(3, 100_000);
+        e.get_ready();
+        let s = e.alpha_beta(&mut board, MIN, MAX, 12).unwrap();
+        println!("{:?}", s)
     }
 }

@@ -16,9 +16,7 @@ pub struct BitBoard {
 
 impl Default for BitBoard {
     fn default() -> Self {
-        BitBoard {
-            board: INIT_BITBOARD,
-        }
+        BitBoard { board: 0 }
     }
 }
 
