@@ -1,7 +1,10 @@
+#[cfg(not(target_family = "wasm"))]
 mod app_console;
+#[cfg(target_family = "wasm")]
 mod app_web;
 mod bit_board;
 mod board;
+#[cfg(not(target_family = "wasm"))]
 mod game_database;
 mod r#move;
 mod move_engine;

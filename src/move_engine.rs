@@ -18,6 +18,7 @@ impl Engine {
         Engine {
             timer: Timer::new(seconds),
             table: Table::new(table_size),
+            #[cfg(not(target_family = "wasm"))]
             database: GameDatabase::new(),
         }
     }
@@ -58,9 +59,17 @@ impl Engine {
         mut beta: Score,
         depth: u8,
     ) -> Result<Score, TimeoutError> {
+        #[cfg(not(target_family = "wasm"))]
         let saved_score: Option<Score> = if board.nmoves() == PLY {
             self.database.get(&board.bitboard())
         } else if depth >= 1 {
+            self.table.get(&board.bitboard())
+        } else {
+            None
+        };
+
+        #[cfg(target_family = "wasm")]
+        let saved_score: Option<Score> = if depth >= 1 {
             self.table.get(&board.bitboard())
         } else {
             None
@@ -116,7 +125,12 @@ impl Engine {
                         }
                     }
                 }
+                #[cfg(not(target_family = "wasm"))]
                 if depth >= 1 && board.nmoves() != PLY {
+                    self.table.set(board.bitboard(), eval);
+                }
+                #[cfg(target_family = "wasm")]
+                if depth >= 1 {
                     self.table.set(board.bitboard(), eval);
                 }
                 Ok(eval)
@@ -201,11 +215,16 @@ impl Engine {
         }
 
         let max_depth: u8 = board.free_cells();
+
+        #[cfg(not(target_family = "wasm"))]
         let min_depth = if board.nmoves() <= PLY {
             GOOD_QUERY - board.nmoves() + 2
         } else {
             1
         };
+        #[cfg(target_family = "wasm")]
+        let min_depth = 1;
+
         for i in min_depth..max_depth {
             self.table.clean();
             match self.move_list(&mut tb, &movelist, i) {

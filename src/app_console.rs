@@ -1,3 +1,5 @@
+#![cfg(not(target_family = "wasm"))]
+
 use crate::board::*;
 use crate::move_engine::*;
 use crate::score;

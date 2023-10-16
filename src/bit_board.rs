@@ -7,9 +7,14 @@ use serde::{Deserialize, Serialize};
 const INIT_BITBOARD: u64 =
     0b0_110_110_110_110_110_110_110_000000000000000000000000000000000000000000;
 
-#[derive(Clone, Copy, Hash, PartialEq, Eq, Debug, PartialOrd, Ord)]
 #[cfg(not(target_family = "wasm"))]
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Debug, PartialOrd, Ord, Serialize, Deserialize)]
+pub struct BitBoard {
+    board: u64,
+}
+
+#[cfg(target_family = "wasm")]
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Debug, PartialOrd, Ord)]
 pub struct BitBoard {
     board: u64,
 }

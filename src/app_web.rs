@@ -27,7 +27,7 @@ fn board_to_arr(board: &Board) -> [[CellType; COL as usize]; ROW as usize] {
                 arr[rrow as usize][col as usize] = CellType::Empty;
             } else {
                 let offset: u64 = row * COL + (col as u64);
-                let bit = (bb.board() & (0b1 << offset)) >> (offset);
+                let bit = (bb.board().board() & (0b1 << offset)) >> (offset);
                 if bit == 0 {
                     arr[rrow as usize][col as usize] = CellType::P1;
                 } else {
