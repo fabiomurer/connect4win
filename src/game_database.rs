@@ -1,13 +1,13 @@
 use crate::bit_board::*;
 use crate::score::*;
 use bincode;
-use bincode::config::Infinite;
 use serde::{Deserialize, Serialize};
 
 use std::fs::*;
 use std::io::BufReader;
 
 pub const PLY: u8 = 12;
+pub const GOOD_QUERY: u8 = PLY + 1;
 const ENTRYS: usize = 4200899;
 
 const DBIN: &str = "./database/db-12ply-distance.txt";
@@ -32,19 +32,16 @@ impl GameDatabase {
         GameDatabase { data }
     }
 
-    pub fn get(&self, key: &DoubleBitBoard) -> Score {
+    pub fn get(&self, key: &DoubleBitBoard) -> Option<Score> {
         match self.data.binary_search_by_key(&key.board(), |e| e.key) {
-            Ok(index) => self.data[index].score,
+            Ok(index) => Some(self.data[index].score),
             Err(_) => {
                 match self
                     .data
                     .binary_search_by_key(&key.board_mirrored(), |e| e.key)
                 {
-                    Ok(index) => self.data[index].score,
-                    Err(_) => {
-                        key.board().print();
-                        panic!("no DB?")
-                    }
+                    Ok(index) => Some(self.data[index].score),
+                    Err(_) => None,
                 }
             }
         }
@@ -138,6 +135,6 @@ mod test {
             normal: e.key,
             mirrored: e.key,
         };
-        assert_eq!(db.get(&bb), e.score)
+        assert_eq!(db.get(&bb).unwrap(), e.score)
     }
 }

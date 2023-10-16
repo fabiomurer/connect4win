@@ -59,7 +59,7 @@ impl Engine {
         depth: u8,
     ) -> Result<Score, TimeoutError> {
         let saved_score: Option<Score> = if board.nmoves() == PLY {
-            Some(self.database.get(&board.bitboard()))
+            self.database.get(&board.bitboard())
         } else if depth >= 1 {
             self.table.get(&board.bitboard())
         } else {
@@ -116,7 +116,7 @@ impl Engine {
                         }
                     }
                 }
-                if depth >= 1 {
+                if depth >= 1 && board.nmoves() != PLY {
                     self.table.set(board.bitboard(), eval);
                 }
                 Ok(eval)
@@ -195,13 +195,18 @@ impl Engine {
         let mut tb: Board = board.clone();
         let mut movelist = Self::init_move_array(&tb);
         let mut bestmove: Move = movelist[0];
-        let cells: u8 = board.free_cells();
 
         if board.is_empty() {
             return Move::new(3, board.player(), EQUAL, 0);
         }
 
-        for i in 1..cells {
+        let max_depth: u8 = board.free_cells();
+        let min_depth = if board.nmoves() <= PLY {
+            GOOD_QUERY - board.nmoves() + 2
+        } else {
+            1
+        };
+        for i in min_depth..max_depth {
             self.table.clean();
             match self.move_list(&mut tb, &movelist, i) {
                 Ok(mut ml) => {
@@ -252,7 +257,7 @@ mod tests {
         let mut board = Board::new();
         let mut e = Engine::new(3, 100_000);
         e.get_ready();
-        let s = e.alpha_beta(&mut board, MIN, MAX, 12).unwrap();
-        println!("{:?}", s)
+        let s: Score = e.alpha_beta(&mut board, MIN, MAX, GOOD_QUERY).unwrap();
+        println!("{}", ScoreMethods::to_string(&s))
     }
 }

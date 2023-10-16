@@ -1,6 +1,6 @@
 # Database of all connect-4 positions with 12 pieces with their theoretical results and winning distances
 
-**does not constains mirrored positions**
+**does not constains mirrored positions and position witch next move is forced (win, lose)**
 
 database decoded from [this database](https://github.com/MarkusThill/Connect-Four/blob/master/CFour/src/openingBook/bookDeepDist.dat) in more readable format.
 

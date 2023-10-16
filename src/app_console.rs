@@ -1,5 +1,6 @@
 use crate::board::*;
 use crate::move_engine::*;
+use crate::score;
 
 use clap::*;
 use std::io;
@@ -60,16 +61,17 @@ pub fn app() {
             };
 
             while board.gamestate() == GameState::Open {
-                if board.player() == human {
+                if board.player() == human && board.gamestate() == GameState::Open {
                     let mut buf = String::new();
                     io::stdin().read_line(&mut buf).unwrap();
                     let col: u8 = buf.trim().parse().unwrap();
 
                     board.make_move(col);
-                } else {
+                } else if board.player() != human && board.gamestate() == GameState::Open {
                     let m = e.iterative_depening(&board);
                     board.make_move(m.col());
                     println!("{:?}", m);
+                    println!("SCORE: {}", score::ScoreMethods::to_string(&m.score()))
                 }
 
                 board.bitboard().print();
