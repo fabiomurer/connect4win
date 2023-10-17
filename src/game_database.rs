@@ -89,7 +89,7 @@ mod test {
 
         let score: Score;
         if s == 0 {
-            score = EQUAL;
+            score = DRAW + dist;
         } else if s > 0 {
             score = W1 - dist;
         } else {

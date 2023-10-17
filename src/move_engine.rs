@@ -235,6 +235,10 @@ impl Engine {
                     }
                     movelist = ml;
                     bestmove = movelist[0];
+
+                    if bestmove.score().gamestate() != GameState::Open {
+                        break;
+                    }
                 }
                 Err(TimeoutError) => {
                     return bestmove;

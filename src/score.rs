@@ -18,7 +18,7 @@ const MAXMOVES: i32 = (COL * ROW) as i32;
 const MINW1: Score = W1 - MAXMOVES;
 const MINW2: Score = W2 + MAXMOVES;
 
-const DRAW: Score = MINW2 + 1;
+pub const DRAW: Score = MINW2 + 1;
 const MINDRAW: Score = DRAW + MAXMOVES;
 
 pub trait ScoreMethods {
