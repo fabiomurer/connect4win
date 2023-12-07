@@ -103,6 +103,7 @@ impl BitBoard {
         }
     }
 
+    #[allow(dead_code)]
     pub fn board(&self) -> u64 {
         self.board
     }

@@ -8,8 +8,11 @@ use std::io::BufReader;
 
 pub const PLY: u8 = 12;
 pub const GOOD_QUERY: u8 = PLY + 1;
+
+#[allow(dead_code)]
 const ENTRYS: usize = 4200899;
 
+#[allow(dead_code)]
 const DBIN: &str = "./database/db-12ply-distance.txt";
 const DBOUT: &str = "./database/db-12ply-distance";
 
@@ -47,6 +50,7 @@ impl GameDatabase {
         }
     }
 
+    #[allow(dead_code)]
     fn set_data(&mut self, mut data: Vec<Entry>) {
         data.sort_by_key(|e| e.key);
         self.data = data;
@@ -55,7 +59,6 @@ impl GameDatabase {
 
 #[cfg(test)]
 mod test {
-    use crate::score::EQUAL;
 
     use super::*;
     use std::fs::File;

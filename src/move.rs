@@ -9,6 +9,7 @@ pub struct Move {
     col: u8,
     player: Player,
     score: Score,
+    #[allow(dead_code)]
     depth: u8,
 }
 

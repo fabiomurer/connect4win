@@ -1,5 +1,3 @@
-use std::fmt;
-
 use crate::board::{Board, GameState, COL, ROW};
 /// 0 for draw,
 /// W1 - depth for WinP1

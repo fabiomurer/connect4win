@@ -1,7 +1,6 @@
 use crate::bit_board::*;
 use crate::score::*;
 use crate::score_board::*;
-use std::cmp::Ordering;
 
 pub const COL: u64 = 7;
 pub const ROW: u64 = 6;

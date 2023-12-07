@@ -23,10 +23,12 @@ impl Engine {
         }
     }
 
+    #[allow(dead_code)]
     pub fn set_time(&mut self, seconds: u64) {
         self.timer.set_duration(seconds);
     }
 
+    #[allow(dead_code)]
     pub fn set_table(&mut self, table_size: usize) {
         self.table.set_size(table_size);
     }
